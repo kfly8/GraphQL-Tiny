@@ -2,84 +2,85 @@ package GraphQL::Tiny::Language::Kinds;
 use strict;
 use warnings;
 
-use Type::Library
-    -base,
-    -declare => qw( Kind );
+use Exporter 'import';
 
-use Type::Utils;
-use Types::Standard -types;
+our @EXPORT_OK = qw(Kind);
+
+use Type::Utils qw(enum);
 
 # The set of allowed kind values for AST nodes.
-enum 'Kind', [
-  # Name
-  'Name',
+sub Kind() {
+    enum 'Kind', [
+      # Name
+      'Name',
 
-  # Document
-  'Document',
-  'OperationDefinition',
-  'VariableDefinition',
-  'SelectionSet',
-  'Field',
-  'Argument',
+      # Document
+      'Document',
+      'OperationDefinition',
+      'VariableDefinition',
+      'SelectionSet',
+      'Field',
+      'Argument',
 
-  # Nullability Modifiers
-  'ListNullabilityOperator',
-  'NonNullAssertion',
-  'ErrorBoundary',
+      # Nullability Modifiers
+      'ListNullabilityOperator',
+      'NonNullAssertion',
+      'ErrorBoundary',
 
-  # Fragments
-  'FragmentSpread',
-  'InlineFragment',
-  'FragmentDefinition',
+      # Fragments
+      'FragmentSpread',
+      'InlineFragment',
+      'FragmentDefinition',
 
-  # Values
-  'Variable',
-  'IntValue',
-  'FloatValue',
-  'StringValue',
-  'BooleanValue',
-  'NullValue',
-  'EnumValue',
-  'ListValue',
-  'ObjectValue',
-  'ObjectField',
+      # Values
+      'Variable',
+      'IntValue',
+      'FloatValue',
+      'StringValue',
+      'BooleanValue',
+      'NullValue',
+      'EnumValue',
+      'ListValue',
+      'ObjectValue',
+      'ObjectField',
 
-  # Directives
-  'Directive',
+      # Directives
+      'Directive',
 
-  # Types
-  'NamedType',
-  'ListType',
-  'NonNullType',
+      # Types
+      'NamedType',
+      'ListType',
+      'NonNullType',
 
-  # Type System Definitions
-  'SchemaDefinition',
-  'OperationTypeDefinition',
+      # Type System Definitions
+      'SchemaDefinition',
+      'OperationTypeDefinition',
 
-  # Type Definitions
-  'ScalarTypeDefinition',
-  'ObjectTypeDefinition',
-  'FieldDefinition',
-  'InputValueDefinition',
-  'InterfaceTypeDefinition',
-  'UnionTypeDefinition',
-  'EnumTypeDefinition',
-  'EnumValueDefinition',
-  'InputObjectTypeDefinition',
+      # Type Definitions
+      'ScalarTypeDefinition',
+      'ObjectTypeDefinition',
+      'FieldDefinition',
+      'InputValueDefinition',
+      'InterfaceTypeDefinition',
+      'UnionTypeDefinition',
+      'EnumTypeDefinition',
+      'EnumValueDefinition',
+      'InputObjectTypeDefinition',
 
-  # Directive Definitions
-  'DirectiveDefinition',
+      # Directive Definitions
+      'DirectiveDefinition',
 
-  # Type System Extensions
-  'SchemaExtension',
+      # Type System Extensions
+      'SchemaExtension',
 
-  # Type Extensions
-  'ScalarTypeExtension',
-  'ObjectTypeExtension',
-  'InterfaceTypeExtension',
-  'UnionTypeExtension',
-  'EnumTypeExtension',
-  'InputObjectTypeExtension',
-];
+      # Type Extensions
+      'ScalarTypeExtension',
+      'ObjectTypeExtension',
+      'InterfaceTypeExtension',
+      'UnionTypeExtension',
+      'EnumTypeExtension',
+      'InputObjectTypeExtension',
+    ];
+}
 
 1;
