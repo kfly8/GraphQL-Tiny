@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use GraphQL::Tiny::Language::Kinds qw(Kind);
+use GraphQL::Tiny::Language::Kinds qw(KIND Kind);
 
 subtest 'Kind' => sub {
     isa_ok Kind, 'Type::Tiny';
@@ -10,6 +10,10 @@ subtest 'Kind' => sub {
 
     ok Kind->check('Name');
     ok !Kind->check('Namee');
+};
+
+subtest 'KIND' => sub {
+    ok KIND->{NAME}, 'Name';
 };
 
 done_testing;
