@@ -7,14 +7,15 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(Source build_Source is_Source);
 
+use Carp qw(croak);
 use Types::Common -types;
 use Type::Utils;
 
 use constant Location =>
     declare 'Location',
         as Dict[
-            line => PositiveInt,
-            column => PositiveInt,
+            line => Int,
+            column => Int,
         ];
 
 # A representation of source input to GraphQL. The `name` and `locationOffset` parameters are
@@ -31,14 +32,22 @@ use constant Source =>
         ];
 
 sub build_Source {
-    my %args = @_;
+    my ($body, $name, $location_offset) = @_;
 
     my $source = {};
-    $source->{body} = $args{body};
-    $source->{name} = $args{name};
-    $source->{location_offset} = $args{location_offset} // { line => 1, column => 1 };
+    $source->{body} = $body;
+    $source->{name} = $name // 'GraphQL request';
+    $source->{location_offset} = $location_offset // { line => 1, column => 1 };
 
     if (ASSERT) {
+        unless ($source->{location_offset}{line} > 0) {
+            croak 'line in locationOffset is 1-indexed and must be positive.',
+        }
+
+        unless ($source->{location_offset}{column} > 0) {
+            croak 'column in locationOffset is 1-indexed and must be positive.',
+        }
+
         Source->assert_valid($source);
     }
 
