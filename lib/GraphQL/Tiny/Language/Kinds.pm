@@ -6,81 +6,82 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(Kind);
 
-use Type::Utils qw(enum);
+use Types::Common -types;
+use Type::Utils;
 
 # The set of allowed kind values for AST nodes.
-sub Kind() {
-    enum 'Kind', [
-      # Name
-      'Name',
+use constant Kind =>
+    declare 'Kind',
+    as Enum[
+    # Name
+    'Name',
 
-      # Document
-      'Document',
-      'OperationDefinition',
-      'VariableDefinition',
-      'SelectionSet',
-      'Field',
-      'Argument',
+    # Document
+    'Document',
+    'OperationDefinition',
+    'VariableDefinition',
+    'SelectionSet',
+    'Field',
+    'Argument',
 
-      # Nullability Modifiers
-      'ListNullabilityOperator',
-      'NonNullAssertion',
-      'ErrorBoundary',
+    # Nullability Modifiers
+    'ListNullabilityOperator',
+    'NonNullAssertion',
+    'ErrorBoundary',
 
-      # Fragments
-      'FragmentSpread',
-      'InlineFragment',
-      'FragmentDefinition',
+    # Fragments
+    'FragmentSpread',
+    'InlineFragment',
+    'FragmentDefinition',
 
-      # Values
-      'Variable',
-      'IntValue',
-      'FloatValue',
-      'StringValue',
-      'BooleanValue',
-      'NullValue',
-      'EnumValue',
-      'ListValue',
-      'ObjectValue',
-      'ObjectField',
+    # Values
+    'Variable',
+    'IntValue',
+    'FloatValue',
+    'StringValue',
+    'BooleanValue',
+    'NullValue',
+    'EnumValue',
+    'ListValue',
+    'ObjectValue',
+    'ObjectField',
 
-      # Directives
-      'Directive',
+    # Directives
+    'Directive',
 
-      # Types
-      'NamedType',
-      'ListType',
-      'NonNullType',
+    # Types
+    'NamedType',
+    'ListType',
+    'NonNullType',
 
-      # Type System Definitions
-      'SchemaDefinition',
-      'OperationTypeDefinition',
+    # Type System Definitions
+    'SchemaDefinition',
+    'OperationTypeDefinition',
 
-      # Type Definitions
-      'ScalarTypeDefinition',
-      'ObjectTypeDefinition',
-      'FieldDefinition',
-      'InputValueDefinition',
-      'InterfaceTypeDefinition',
-      'UnionTypeDefinition',
-      'EnumTypeDefinition',
-      'EnumValueDefinition',
-      'InputObjectTypeDefinition',
+    # Type Definitions
+    'ScalarTypeDefinition',
+    'ObjectTypeDefinition',
+    'FieldDefinition',
+    'InputValueDefinition',
+    'InterfaceTypeDefinition',
+    'UnionTypeDefinition',
+    'EnumTypeDefinition',
+    'EnumValueDefinition',
+    'InputObjectTypeDefinition',
 
-      # Directive Definitions
-      'DirectiveDefinition',
+    # Directive Definitions
+    'DirectiveDefinition',
 
-      # Type System Extensions
-      'SchemaExtension',
+    # Type System Extensions
+    'SchemaExtension',
 
-      # Type Extensions
-      'ScalarTypeExtension',
-      'ObjectTypeExtension',
-      'InterfaceTypeExtension',
-      'UnionTypeExtension',
-      'EnumTypeExtension',
-      'InputObjectTypeExtension',
-    ];
-}
+    # Type Extensions
+    'ScalarTypeExtension',
+    'ObjectTypeExtension',
+    'InterfaceTypeExtension',
+    'UnionTypeExtension',
+    'EnumTypeExtension',
+    'InputObjectTypeExtension',
+];
 
 1;

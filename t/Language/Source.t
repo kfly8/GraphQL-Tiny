@@ -6,6 +6,7 @@ use GraphQL::Tiny::Language::Source qw(Source build_Source is_Source);
 
 subtest 'Source' => sub {
     isa_ok Source, 'Type::Tiny';
+    is Source->display_name, 'Source';
 };
 
 subtest 'build_Source' => sub {

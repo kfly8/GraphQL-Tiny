@@ -4,29 +4,31 @@ use warnings;
 use GraphQL::Tiny::Utils::Assert;
 
 use Exporter 'import';
-use Types::Common -types;
 
 our @EXPORT_OK = qw(Source build_Source is_Source);
 
-sub Location() {
-    Dict[
-        line => PositiveInt,
-        column => PositiveInt,
-    ]
-}
+use Types::Common -types;
+use Type::Utils;
+
+use constant Location =>
+    declare 'Location',
+        as Dict[
+            line => PositiveInt,
+            column => PositiveInt,
+        ];
 
 # A representation of source input to GraphQL. The `name` and `locationOffset` parameters are
 # optional, but they are useful for clients who store GraphQL documents in source files.
 # For example, if the GraphQL input starts at line 40 in a file named `Foo.graphql`, it might
 # be useful for `name` to be `"Foo.graphql"` and location to be `{ line: 40, column: 1 }`.
 # The `line` and `column` properties in `locationOffset` are 1-indexed.
-sub Source() {
-    Dict[
-        body => Str,
-        name => Str,
-        location_offset => Location,
-    ];
-}
+use constant Source =>
+    declare 'Source',
+        as Dict[
+            body => Str,
+            name => Str,
+            location_offset => Location,
+        ];
 
 sub build_Source {
     my %args = @_;
