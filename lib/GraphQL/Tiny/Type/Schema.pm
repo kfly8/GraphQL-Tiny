@@ -17,6 +17,6 @@ use Types::Standard -types;
 # the risk of conflicts. We recommend you add at most one extension field,
 # an object which can contain all the values you need.
 declare 'GraphQLSchemaExtensions',
-  Dict[attributeName => Any];
+  as Dict[attributeName => Any];
 
 1;
