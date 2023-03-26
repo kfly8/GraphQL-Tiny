@@ -3,13 +3,81 @@ use warnings;
 use Test::More;
 
 use GraphQL::Tiny::Language::Source qw(build_Source);
-
 use GraphQL::Tiny::Language::Ast qw(
     Token
     build_Token
     Location
     build_Location
 );
+
+my @Nodes = qw(
+    ASTNode
+    NameNode
+    DocumentNode
+    DefinitionNode
+    ExecutableDefinitionNode
+    OperationDefinitionNode
+    OperationTypeNode
+    VariableDefinitionNode
+    VariableNode
+    SelectionSetNode
+    SelectionNode
+    FieldNode
+    NullabilityAssertionNode
+    ListNullabilityOperatorNode
+    NonNullAssertionNode
+    ErrorBoundaryNode
+    ArgumentNode
+    ConstArgumentNode
+    FragmentSpreadNode
+    InlineFragmentNode
+    FragmentDefinitionNode
+    ValueNode
+    ConstValueNode
+    IntValueNode
+    FloatValueNode
+    StringValueNode
+    BooleanValueNode
+    NullValueNode
+    EnumValueNode
+    ListValueNode
+    ConstListValueNode
+    ObjectValueNode
+    ConstObjectValueNode
+    ObjectFieldNode
+    ConstObjectFieldNode
+    DirectiveNode
+    ConstDirectiveNode
+    TypeNode
+    NamedTypeNode
+    ListTypeNode
+    NonNullTypeNode
+    TypeSystemDefinitionNode
+    SchemaDefinitionNode
+    OperationTypeDefinitionNode
+    TypeDefinitionNode
+    ScalarTypeDefinitionNode
+    ObjectTypeDefinitionNode
+    FieldDefinitionNode
+    InputValueDefinitionNode
+    InterfaceTypeDefinitionNode
+    UnionTypeDefinitionNode
+    EnumTypeDefinitionNode
+    EnumValueDefinitionNode
+    InputObjectTypeDefinitionNode
+    DirectiveDefinitionNode
+    TypeSystemExtensionNode
+    SchemaExtensionNode
+    TypeExtensionNode
+    ScalarTypeExtensionNode
+    ObjectTypeExtensionNode
+    InterfaceTypeExtensionNode
+    UnionTypeExtensionNode
+    EnumTypeExtensionNode
+    InputObjectTypeExtensionNode
+);
+
+use GraphQL::Tiny::Language::Ast @Nodes;
 
 subtest 'Token' => sub {
     isa_ok Token, 'Type::Tiny';
@@ -41,6 +109,13 @@ subtest 'build_Location' => sub {
     is $location->{start_token}, $start_token;
     is $location->{end_token}, $end_token;
     is $location->{source}, $source;
+};
+
+subtest 'ASTNode' => sub {
+    for my $Name (@Nodes) {
+        my $code = __PACKAGE__->can($Name);
+        isa_ok $code->(), 'Type::Tiny', $Name;
+    }
 };
 
 done_testing;

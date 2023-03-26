@@ -8,6 +8,7 @@ our @EXPORT = qw(
     type as
 
     Any
+    Bool
     Dict
     Enum
     HashRef
@@ -27,6 +28,7 @@ use Type::Utils qw(type as);
 use Types::Standard qw(
     Any
     ArrayRef
+    Bool
     Dict
     Enum
     HashRef
