@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use GraphQL::Tiny::Utils::Type;
 
+use Carp qw(croak);
 use Exporter 'import';
 
 our @EXPORT_OK = qw(KIND Kind);
@@ -80,6 +81,29 @@ use constant KIND => {
   INPUT_OBJECT_TYPE_EXTENSION => 'InputObjectTypeExtension',
 };
 
-use constant Kind => type 'Kind', as Enum[ values %{ KIND() }];
+my $Kind = type 'Kind', as Enum[ values %{ KIND() } ];
+
+my $KindItem = type 'KindItem', as Str,
+    name_generator => sub {
+        my (undef, $kind) = @_;
+        sprintf 'Kind[%s]', $kind;
+    },
+    constraint_generator => sub {
+        my ($kind) = @_;
+        return sub {
+            $_ eq KIND->{$kind}
+        }
+    };
+
+my %KindMap = map { $_ => $KindItem->of($_) } keys %{ KIND() };
+
+sub Kind(;$) {
+    unless (@_) {
+        return $Kind;
+    }
+
+    my ($kind) = @{ $_[0] };
+    $KindMap{$kind} or croak "Cannot find kind: $kind";
+}
 
 1;
