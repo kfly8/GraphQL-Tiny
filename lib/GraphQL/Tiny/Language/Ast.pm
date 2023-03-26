@@ -7,8 +7,8 @@ use GraphQL::Tiny::Utils::Type;
 use GraphQL::Tiny::Language::Kinds qw(Kind KIND);
 
 our @EXPORT_OK = qw(
-    build_Token
-    build_Location
+    build_token
+    build_location
 );
 
 use Type::Library -base, -declare => qw(
@@ -141,7 +141,7 @@ type 'Token', do {
     ];
 };
 
-sub build_Token {
+sub build_token {
     my ($kind, $start, $end, $line, $column, $value) = @_;
     my $token = {};
     $token->{kind} = $kind;
@@ -180,7 +180,7 @@ type 'Location',
         source => Source,
     ];
 
-sub build_Location {
+sub build_location {
     my ($start_token, $end_token, $source) = @_;
 
     if (ASSERT) {

@@ -7,16 +7,15 @@ use GraphQL::Tiny::Utils::Type;
 use Carp qw(croak);
 use Exporter 'import';
 
-our @EXPORT_OK = qw(build_Source is_Source);
+our @EXPORT_OK = qw(build_source is_Source);
 
 use Type::Library -base, -declare => qw(Source);
 
-use constant Location =>
-    type 'Location',
-        as Dict[
-            line => Int,
-            column => Int,
-        ];
+my $Location = type 'Location',
+    as Dict[
+        line => Int,
+        column => Int,
+    ];
 
 # A representation of source input to GraphQL. The `name` and `locationOffset` parameters are
 # optional, but they are useful for clients who store GraphQL documents in source files.
@@ -27,10 +26,10 @@ type 'Source',
     as Dict[
         body => Str,
         name => Str,
-        location_offset => Location,
+        location_offset => $Location,
     ];
 
-sub build_Source {
+sub build_source {
     my ($body, $name, $location_offset) = @_;
 
     my $source = {};

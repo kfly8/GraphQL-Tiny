@@ -6,16 +6,16 @@ BEGIN {
     $ENV{GRAPHQL_TINY_ASSERT} = 1;
 }
 
-use GraphQL::Tiny::Language::Source qw(Source build_Source is_Source);
+use GraphQL::Tiny::Language::Source qw(Source build_source is_Source);
 
 subtest 'Source' => sub {
     isa_ok Source, 'Type::Tiny';
     is Source->display_name, 'Source';
 };
 
-subtest 'build_Source' => sub {
+subtest 'build_source' => sub {
     subtest 'default' => sub {
-        my $source = build_Source('my body');
+        my $source = build_source('my body');
 
         is $source->{body}, 'my body';
         is $source->{name}, 'GraphQL request';
@@ -24,7 +24,7 @@ subtest 'build_Source' => sub {
     };
 
     subtest 'set location_offset' => sub {
-        my $source = build_Source('my body', 'my name',
+        my $source = build_source('my body', 'my name',
             {
                 line => 123,
                 column => 456,
@@ -39,29 +39,29 @@ subtest 'build_Source' => sub {
 
     subtest 'rejects invalid locationOffset' => sub {
         {
-            eval { build_Source('', '', { line => 0, column => 1 }) };
+            eval { build_source('', '', { line => 0, column => 1 }) };
             like $@, qr/^line in locationOffset is 1-indexed and must be positive./
         }
 
         {
-            eval { build_Source('', '', { line => -1, column => 1 }) };
+            eval { build_source('', '', { line => -1, column => 1 }) };
             like $@, qr/^line in locationOffset is 1-indexed and must be positive./
         }
 
         {
-            eval { build_Source('', '', { line => 1, column => 0 }) };
+            eval { build_source('', '', { line => 1, column => 0 }) };
             like $@, qr/^column in locationOffset is 1-indexed and must be positive./
         }
 
         {
-            eval { build_Source('', '', { line => 1, column => -1 }) };
+            eval { build_source('', '', { line => 1, column => -1 }) };
             like $@, qr/^column in locationOffset is 1-indexed and must be positive./
         }
     };
 };
 
 subtest 'is_Source' => sub {
-    my $source = build_Source('my body', 'my name');
+    my $source = build_source('my body', 'my name');
     ok is_Source($source);
     ok !is_Source('');
 };

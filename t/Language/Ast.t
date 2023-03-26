@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use GraphQL::Tiny::Language::Source qw(build_Source);
+use GraphQL::Tiny::Language::Source qw(build_source);
 
 my @nodes = qw(
     ASTNode
@@ -72,7 +72,7 @@ my @nodes = qw(
 );
 
 use GraphQL::Tiny::Language::Ast (
-    qw(Token build_Token Location build_Location),
+    qw(Token build_token Location build_location),
 );
 
 use GraphQL::Tiny::Language::Ast -types;
@@ -81,8 +81,8 @@ subtest 'Token' => sub {
     isa_ok Token, 'Type::Tiny';
 };
 
-subtest 'build_Token' => sub {
-    my $token = build_Token('Name', 1, 2, 123, 456, 'value');
+subtest 'build_token' => sub {
+    my $token = build_token('Name', 1, 2, 123, 456, 'value');
 
     is $token->{kind}, 'Name';
     is $token->{start}, '1';
@@ -96,12 +96,12 @@ subtest 'Location' => sub {
     isa_ok Location, 'Type::Tiny';
 };
 
-subtest 'build_Location' => sub {
-    my $start_token = build_Token('Name', 1, 2, 123, 456, 'start');
-    my $end_token = build_Token('Name', 2, 3, 234, 567, 'end');
-    my $source = build_Source('body');
+subtest 'build_location' => sub {
+    my $start_token = build_token('Name', 1, 2, 123, 456, 'start');
+    my $end_token = build_token('Name', 2, 3, 234, 567, 'end');
+    my $source = build_source('body');
 
-    my $location = build_Location($start_token, $end_token, $source);
+    my $location = build_location($start_token, $end_token, $source);
     is $location->{start}, 1;
     is $location->{end}, 3;
     is $location->{start_token}, $start_token;
