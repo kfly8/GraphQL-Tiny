@@ -4,16 +4,20 @@ use warnings;
 use GraphQL::Tiny::Utils::Assert;
 use GraphQL::Tiny::Utils::Type;
 
-use Exporter 'import';
+use GraphQL::Tiny::Language::Kinds qw(Kind KIND);
 
 our @EXPORT_OK = qw(
-    Token
     build_Token
-
-    Location
     build_Location
+);
+
+use Type::Library -base, -declare => qw(
+    Token
+    Location
 
     ASTNode
+    ASTKindToNode
+
     NameNode
     DocumentNode
     DefinitionNode
@@ -86,7 +90,7 @@ use GraphQL::Tiny::Language::TokenKind qw(TokenKind);
 
 # Represents a range of characters represented by a lexical token
 # within a Source.
-use constant Token => do {
+type 'Token', do {
     my $BaseToken = type 'BaseToken', as Dict[
         # The kind of Token.
         kind => TokenKind,
@@ -130,13 +134,11 @@ use constant Token => do {
         return 1;
     };
 
-    my $Token = type 'Token', as $BaseToken & Dict[
+    as $BaseToken & Dict[
         prev => $PrevToken | Null,
         next => $NextToken | Null,
         Slurpy[Any]
     ];
-
-    $Token;
 };
 
 sub build_Token {
@@ -160,8 +162,7 @@ sub build_Token {
 
 # Contains a range of UTF-8 character offsets and token references that
 # identify the region of the source from which the AST derived.
-use constant Location =>
-    type 'Location',
+type 'Location',
     as Dict[
         # The character offset at which this Node begins.
         start => Int,
@@ -198,8 +199,7 @@ sub build_Location {
 }
 
 # The list of all possible AST node types.
-use constant ASTNode =>
-  type 'ASTNode',
+type 'ASTNode',
   as NameNode
   | DocumentNode
   | OperationDefinitionNode
@@ -247,19 +247,19 @@ use constant ASTNode =>
   | ErrorBoundaryNode
   | ListNullabilityOperatorNode;
 
+# TODO(port):
 # Utility type listing all nodes indexed by their kind.
-use constant ASTKindToNode => do {
-
-    my @dict;
-    for my $Node (@{$ASTNode->type_constraints}) {
-        my $Kind = $Node->parent->parameters->[1];
-        my $key = $Kind->parameters->[0];
-
-        push @dict => (KIND->{$key}, $Node);
-    }
-
-    type 'ASTKindToNode', as Dict[@dict];
-};
+type 'ASTKindToNode', as Dict[];
+#    my @dict;
+#    for my $Node (@{ASTNode->parent->type_constraints}) {
+#        my $Kind = $Node->parent->parameters->[1];
+#        my $key = $Kind->parameters->[0];
+#
+#        push @dict => (KIND->{$key}, $Node);
+#    }
+#
+#    as Dict[@dict];
+#};
 
 # TODO(port):
 #
@@ -378,8 +378,7 @@ use constant ASTKindToNode => do {
 
 
 # Name
-use constant NameNode =>
-    type 'NameNode',
+type 'NameNode',
     as Dict[
         kind => Kind['NAME'],
         loc => Optional[ Location | Undef ],
@@ -387,27 +386,23 @@ use constant NameNode =>
     ];
 
 # Document
-use constant DocumentNode =>
-    type 'DocumentNode',
+type 'DocumentNode',
     as Dict[
         kind => Kind['DOCUMENT'],
         loc => Optional[ Location | Undef ],
         definitions => ReadonlyArray[DefinitionNode],
     ];
 
-use constant DefinitionNode =>
-    type 'DefinitionNode',
+type 'DefinitionNode',
     as ExecutableDefinitionNode
      | TypeSystemDefinitionNode
      | TypeSystemExtensionNode;
 
-use constant ExecutableDefinitionNode =>
-    type 'ExecutableDefinitionNode',
+type 'ExecutableDefinitionNode',
     as OperationDefinitionNode
      | FragmentDefinitionNode;
 
-use constant OperationDefinitionNode =>
-    type 'OperationDefinitionNode',
+type 'OperationDefinitionNode',
     as Dict[
         kind => Kind['OPERATION_DEFINITION'],
         loc => Optional[ Location | Undef ],
@@ -416,7 +411,7 @@ use constant OperationDefinitionNode =>
         variableDefinitions => Optional[ ReadonlyArray[VariableDefinitionNode] | Undef ],
         directives => Optional[ ReadonlyArray[DirectiveNode] | Undef ],
         selection_set => SelectionSetNode
-    ;
+    ];
 
 use constant OPERATION_TYPE_NODE => {
     QUERY => 'query',
@@ -424,12 +419,10 @@ use constant OPERATION_TYPE_NODE => {
     SUBSCRIPTION => 'subscription',
 };
 
-use constant OperationTypeNode =>
-    type 'OperationTypeNode',
+type 'OperationTypeNode',
     as Enum[ values %{ OPERATION_TYPE_NODE() } ];
 
-use constant VariableDefinitionNode =>
-    type 'VariableDefinitionNode',
+type 'VariableDefinitionNode',
     as Dict[
         kind => Kind['VARIABLE_DEFINITION'],
         loc => Optional[ Location | Undef ],
@@ -439,27 +432,23 @@ use constant VariableDefinitionNode =>
         directives => Optional[ ReadonlyArray[ConstDirectiveNode] | Undef ],
     ];
 
-use constant VariableNode =>
-    type 'VariableNode',
+type 'VariableNode',
     as Dict[
         kind => Kind['VARIABLE'],
         loc => Optional[ Location | Undef ],
         name => NameNode,
     ];
 
-use constant SelectionSetNode =>
-    type 'SelectionSetNode',
+type 'SelectionSetNode',
     as Dict[
         kind => Kind['SELECTION_SET'],
         loc => Optional[ Location | Undef ],
         selections => ReadonlyArray[SelectionNode],
     ];
 
-use constant SelectionNode =>
-    type 'SelectionNode', as FieldNode | FragmentSpreadNode | InlineFragmentNode;
+type 'SelectionNode', as FieldNode | FragmentSpreadNode | InlineFragmentNode;
 
-use constant FieldNode =>
-    type 'FieldNode',
+type 'FieldNode',
     as Dict[
         kind => Kind['FIELD'],
         loc => Optional[ Location | Undef ],
@@ -469,42 +458,37 @@ use constant FieldNode =>
         # Note: Client Controlled Nullability is experimental
         # and may be changed or removed in the future.
         nullability_assertion => Optional[ NullabilityAssertionNode | Undef ],
-        directives => Optional[ ReadonlyArray<DirectiveNode> | Undef ],
+        directives => Optional[ ReadonlyArray[DirectiveNode] | Undef ],
         selectionSet => Optional[ SelectionSetNode | Undef ],
     ];
 
-use constant NullabilityAssertionNode =>
-    type 'NullabilityAssertionNode',
+type 'NullabilityAssertionNode',
     as NonNullAssertionNode
      | ErrorBoundaryNode
      | ListNullabilityOperatorNode;
 
-use constant ListNullabilityOperatorNode =>
-    type 'ListNullabilityOperatorNode',
+type 'ListNullabilityOperatorNode',
     as Dict[
         kind => Kind['LIST_NULLABILITY_OPERATOR'],
         loc => Optional[ Location | Undef ],
         nullability_assertion => Optional[ NullabilityAssertionNode | Undef ],
     ];
 
-use constant NonNullAssertionNode =>
-    type 'NonNullAssertionNode',
+type 'NonNullAssertionNode',
     as Dict[
         kind => Kind['NON_NULL_ASSERTION'],
         loc => Optional[ Location | Undef ],
         nullability_assertion => Optional[ ListNullabilityOperatorNode | Undef ],
     ];
 
-use constant ErrorBoundaryNode =>
-    type 'ErrorBoundaryNode',
+type 'ErrorBoundaryNode',
     as Dict[
        kind => Kind['ERROR_BOUNDARY'],
        loc => Optional[ Location | Undef ],
        nullability_assertion => Optional[ ListNullabilityOperatorNode | Undef ],
     ];
 
-use constant ArgumentNode =>
-    type 'ArgumentNode',
+type 'ArgumentNode',
     as Dict[
        kind => Kind['ARGUMENT'],
        loc => Optional[ Location | Undef ],
@@ -512,8 +496,7 @@ use constant ArgumentNode =>
        value => ValueNode,
    ];
 
-use constant ConstArgumentNode =>
-    type 'ConstArgumentNode',
+type 'ConstArgumentNode',
     as Dict[
        kind => Kind['ARGUMENT'],
        loc => Optional[ Location | Undef ],
@@ -522,9 +505,7 @@ use constant ConstArgumentNode =>
     ];
 
 # Fragments
-
-use constant FragmentSpreadNode =>
-    type 'FragmentSpreadNode',
+type 'FragmentSpreadNode',
     as Dict[
        kind => Kind['FRAGMENT_SPREAD'],
        loc => Optional[ Location | Undef ],
@@ -532,8 +513,7 @@ use constant FragmentSpreadNode =>
        directives => Optional[ ReadonlyArray[DirectiveNode] | Undef ],
     ];
 
-use constant InlineFragmentNode =>
-    type 'InlineFragmentNode',
+type 'InlineFragmentNode',
     as Dict[
        kind => Kind['FRAGMENT_SPREAD'],
        loc => Optional[ Location | Undef ],
@@ -542,8 +522,7 @@ use constant InlineFragmentNode =>
        selection_set => SelectionSetNode,
     ];
 
-use constant FragmentDefinitionNode =>
-    type 'FragmentDefinitionNode',
+type 'FragmentDefinitionNode',
     as Dict[
        kind => Kind['FRAGMENT_DEFINITION'],
        loc => Optional[ Location | Undef ],
@@ -552,14 +531,12 @@ use constant FragmentDefinitionNode =>
        # @deprecated variableDefinitions will be removed in v17.0.0 */
        variable_definitions => Optional[ ReadonlyArray[VariableDefinitionNode] | Undef ],
        type_condition => NamedTypeNode,
-       directives => Optional[ ReadonlyArray<DirectiveNode> | Undef ],
+       directives => Optional[ ReadonlyArray[DirectiveNode] | Undef ],
        selection_set => SelectionSetNode,
     ];
 
 # Values
-
-use constant ValueNode =>
-    type 'ValueNode',
+type 'ValueNode',
     as VariableNode
      | IntValueNode
      | FloatValueNode
@@ -570,8 +547,7 @@ use constant ValueNode =>
      | ListValueNode
      | ObjectValueNode;
 
-use constant ConstValueNode =>
-    type 'ConstValueNode',
+type 'ConstValueNode',
     as IntValueNode
      | FloatValueNode
      | StringValueNode
@@ -581,24 +557,21 @@ use constant ConstValueNode =>
      | ConstListValueNode
      | ConstObjectValueNode;
 
-use constant IntValueNode =>
-    type 'IntValueNode',
+type 'IntValueNode',
     as Dict[
        kind => Kind['INT'],
        loc => Optional[ Location | Undef ],
        value => Str,
     ];
 
-use constant FloatValueNode =>
-    type 'FloatValueNode',
+type 'FloatValueNode',
     as Dict[
        kind => Kind['FLOAT'],
        loc => Optional[ Location | Undef ],
        value => Str,
     ];
 
-use constant StringValueNode =>
-    type 'StringValueNode',
+type 'StringValueNode',
     as Dict[
        kind => Kind['STRING'],
        loc => Optional[ Location | Undef ],
@@ -606,63 +579,55 @@ use constant StringValueNode =>
        block => Optional[ Bool | Undef ],
     ];
 
-use constant BooleanValueNode =>
-    type 'BooleanValueNode',
+type 'BooleanValueNode',
     as Dict[
        kind => Kind['BOOLEAN'],
        loc => Optional[ Location | Undef ],
        value => Bool,
     ];
 
-use constant NullValueNode =>
-    type 'NullValueNode',
+type 'NullValueNode',
     as Dict[
        kind => Kind['NULL'],
        loc => Optional[ Location | Undef ],
     ];
 
-use constant EnumValueNode =>
-    type 'EnumValueNode',
+type 'EnumValueNode',
     as Dict[
        kind => Kind['ENUM'],
        loc => Optional[ Location | Undef ],
        value => Str,
     ];
 
-use constant ListValueNode =>
-    type 'ListValueNode',
+type 'ListValueNode',
     as Dict[
        kind => Kind['LIST'],
        loc => Optional[ Location | Undef ],
        value => ReadonlyArray[ValueNode],
     ];
 
-use constant ConstListValueNode =>
-    type 'ConstListValueNode',
+type 'ConstListValueNode',
     as Dict[
        kind => Kind['LIST'],
        loc => Optional[ Location | Undef ],
        value => ReadonlyArray[ConstValueNode],
     ];
 
-use constant ObjectValueNode =>
-    type 'ObjectValueNode',
+type 'ObjectValueNode',
     as Dict[
        kind => Kind['OBJECT'],
        loc => Optional[ Location | Undef ],
        value => ReadonlyArray[ObjectFieldNode],
     ];
 
-use constant ConstObjectValueNode =>
-    type 'ConstObjectValueNode',
+type 'ConstObjectValueNode',
     as Dict[
        kind => Kind['OBJECT'],
        loc => Optional[ Location | Undef ],
        value => ReadonlyArray[ConstObjectFieldNode],
     ];
 
-use constant ObjectFieldNode =>
-    type 'ObjectFieldNode',
+type 'ObjectFieldNode',
     as Dict[
        kind => Kind['OBJECT_FIELD'],
        loc => Optional[ Location | Undef ],
@@ -670,8 +635,7 @@ use constant ObjectFieldNode =>
        value => ValueNode,
     ];
 
-use constant ConstObjectFieldNode =>
-    type 'ConstObjectFieldNode',
+type 'ConstObjectFieldNode',
     as Dict[
        kind => Kind['OBJECT_FIELD'],
        loc => Optional[ Location | Undef ],
@@ -680,9 +644,7 @@ use constant ConstObjectFieldNode =>
     ];
 
 # Directives
-
-use constant DirectiveNode =>
-    type 'DirectiveNode',
+type 'DirectiveNode',
     as Dict[
        kind => Kind['DIRECTIVE'],
        loc => Optional[ Location | Undef ],
@@ -690,8 +652,7 @@ use constant DirectiveNode =>
        arguments => Optional[ ReadonlyArray[ArgumentNode] | Undef ],
     ];
 
-use constant ConstDirectiveNode =>
-    type 'ConstDirectiveNode',
+type 'ConstDirectiveNode',
     as Dict[
        kind => Kind['DIRECTIVE'],
        loc => Optional[ Location | Undef ],
@@ -700,27 +661,23 @@ use constant ConstDirectiveNode =>
     ];
 
 # Type Reference
+type 'TypeNode', as NamedTypeNode | ListTypeNode | NonNullTypeNode;
 
-use constant TypeNode =>
-    type 'TypeNode', as NamedTypeNode | ListTypeNode | NonNullTypeNode;
-
-use constant NamedTypeNode =>
-    type 'NamedTypeNode',
+type 'NamedTypeNode',
     as Dict[
        kind => Kind['NAMED_TYPE'],
        loc => Optional[ Location | Undef ],
        name => NameNode,
+   ];
 
-use constant ListTypeNode =>
-    type 'ListTypeNode',
+type 'ListTypeNode',
     as Dict[
        kind => Kind['LIST_TYPE'],
        loc => Optional[ Location | Undef ],
        type => TypeNode,
    ];
 
-use constant NonNullTypeNode =>
-    type 'NonNullTypeNode',
+type 'NonNullTypeNode',
     as Dict[
        kind => Kind['NON_NULL_TYPE'],
        loc => Optional[ Location | Undef ],
@@ -728,15 +685,12 @@ use constant NonNullTypeNode =>
    ];
 
 # Type System Definition
-
-use constant TypeSystemDefinitionNode =>
-    type 'TypeSystemDefinitionNode',
+type 'TypeSystemDefinitionNode',
     as SchemaDefinitionNode
      | TypeDefinitionNode
      | DirectiveDefinitionNode;
 
-use constant SchemaDefinitionNode =>
-    type 'SchemaDefinitionNode',
+type 'SchemaDefinitionNode',
     as Dict[
        kind => Kind['SCHEMA_DEFINITION'],
        loc => Optional[ Location | Undef ],
@@ -745,8 +699,7 @@ use constant SchemaDefinitionNode =>
        operation_types => ReadonlyArray[OperationTypeDefinitionNode],
    ];
 
-use constant OperationTypeDefinitionNode =>
-    type 'OperationTypeDefinitionNode',
+type 'OperationTypeDefinitionNode',
     as Dict[
        kind => Kind['OPERATION_TYPE_DEFINITION'],
        loc => Optional[ Location | Undef ],
@@ -755,9 +708,7 @@ use constant OperationTypeDefinitionNode =>
     ];
 
 # Type Definition
-
-use constant TypeDefinitionNode =>
-    type 'TypeDefinitionNode',
+type 'TypeDefinitionNode',
     as ScalarTypeDefinitionNode
      | ObjectTypeDefinitionNode
      | InterfaceTypeDefinitionNode
@@ -765,8 +716,7 @@ use constant TypeDefinitionNode =>
      | EnumTypeDefinitionNode
      | InputObjectTypeDefinitionNode;
 
-use constant ScalarTypeDefinitionNode =>
-    type 'ScalarTypeDefinitionNode',
+type 'ScalarTypeDefinitionNode',
     as Dict[
        kind => Kind['SCALAR_TYPE_DEFINITION'],
        loc => Optional[ Location | Undef ],
@@ -775,8 +725,7 @@ use constant ScalarTypeDefinitionNode =>
        directives => Optional[ ReadonlyArray[ConstDirectiveNode] | Undef ],
     ];
 
-use constant ObjectTypeDefinitionNode =>
-    type 'ObjectTypeDefinitionNode',
+type 'ObjectTypeDefinitionNode',
     as Dict[
        kind => Kind['OBJECT_TYPE_DEFINITION'],
        loc => Optional[ Location | Undef ],
@@ -786,8 +735,7 @@ use constant ObjectTypeDefinitionNode =>
        fields => Optional[ ReadonlyArray[FieldDefinitionNode] | Undef ],
     ];
 
-use constant FieldDefinitionNode =>
-    type 'FieldDefinitionNode',
+type 'FieldDefinitionNode',
     as Dict[
        kind => Kind['FIELD_DEFINITION'],
        loc => Optional[ Location | Undef ],
@@ -799,8 +747,7 @@ use constant FieldDefinitionNode =>
     ];
 
 
-use constant InputValueDefinitionNode =>
-    type 'InputValueDefinitionNode',
+type 'InputValueDefinitionNode',
     as Dict[
        kind => Kind['INPUT_VALUE_DEFINITION'],
        loc => Optional[ Location | Undef ],
@@ -811,8 +758,7 @@ use constant InputValueDefinitionNode =>
        directives => Optional[ ReadonlyArray[ConstDirectiveNode] | Undef ],
     ];
 
-use constant InterfaceTypeDefinitionNode =>
-    type 'InterfaceTypeDefinitionNode',
+type 'InterfaceTypeDefinitionNode',
     as Dict[
        kind => Kind['INTERFACE_TYPE_DEFINITION'],
        loc => Optional[ Location | Undef ],
@@ -820,12 +766,11 @@ use constant InterfaceTypeDefinitionNode =>
        name => NameNode,
        interfaces => Optional[ ReadonlyArray[NamedTypeNode] | Undef],
        directives => Optional[ ReadonlyArray[ConstDirectiveNode] | Undef ],
-       fields => Optional[ ReadonlyArray[FieldDefinitionNode | Undef ],
+       fields => Optional[ ReadonlyArray[FieldDefinitionNode | Undef ] ],
     ];
 
 
-use constant UnionTypeDefinitionNode =>
-    type 'UnionTypeDefinitionNode',
+type 'UnionTypeDefinitionNode',
     as Dict[
        kind => Kind['UNION_TYPE_DEFINITION'],
        loc => Optional[ Location | Undef ],
@@ -835,8 +780,7 @@ use constant UnionTypeDefinitionNode =>
        types => Optional[ ReadonlyArray[NamedTypeNode] | Undef ],
     ];
 
-use constant EnumTypeDefinitionNode =>
-    type 'EnumTypeDefinitionNode',
+type 'EnumTypeDefinitionNode',
     as Dict[
        kind => Kind['ENUM_TYPE_DEFINITION'],
        loc => Optional[ Location | Undef ],
@@ -846,8 +790,7 @@ use constant EnumTypeDefinitionNode =>
        values => Optional[ ReadonlyArray[EnumValueDefinitionNode] | Undef ],
     ];
 
-use constant EnumValueDefinitionNode =>
-    type 'EnumValueDefinitionNode',
+type 'EnumValueDefinitionNode',
     as Dict[
        kind => Kind['ENUM_VALUE_DEFINITION'],
        loc => Optional[ Location | Undef ],
@@ -856,8 +799,7 @@ use constant EnumValueDefinitionNode =>
        directives => Optional[ ReadonlyArray[ConstDirectiveNode] | Undef ],
     ];
 
-use constant InputObjectTypeDefinitionNode =>
-    type 'InputObjectTypeDefinitionNode',
+type 'InputObjectTypeDefinitionNode',
     as Dict[
        kind => Kind['INPUT_OBJECT_TYPE_DEFINITION'],
        loc => Optional[ Location | Undef ],
@@ -868,9 +810,7 @@ use constant InputObjectTypeDefinitionNode =>
     ];
 
 # Directive Definitions
-
-use constant DirectiveDefinitionNode =>
-    type 'DirectiveDefinitionNode',
+type 'DirectiveDefinitionNode',
     as Dict[
        kind => Kind['DIRECTIVE_DEFINITION'],
        loc => Optional[ Location | Undef ],
@@ -882,22 +822,18 @@ use constant DirectiveDefinitionNode =>
     ];
 
 # Type System Extensions
+type 'TypeSystemExtensionNode', as SchemaExtensionNode | TypeExtensionNode
 
-use constant TypeSystemExtensionNode =>
-    type 'TypeSystemExtensionNode', as SchemaExtensionNode | TypeExtensionNode
-
-use constant SchemaExtensionNode =>
-    type 'SchemaExtensionNode',
+type 'SchemaExtensionNode',
     as Dict[
        kind => Kind['SCHEMA_EXTENSION'],
        loc => Optional[ Location | Undef ],
        directives => Optional[ ReadonlyArray[ConstDirectiveNode] | Undef],
        operation_types => Optional[ ReadonlyArray[OperationTypeDefinitionNode] | Undef ],
+   ];
 
 # Type Extensions
-
-use constant TypeExtensionNode =>
-    type 'TypeExtensionNode',
+type 'TypeExtensionNode',
     as ScalarTypeExtensionNode
      | ObjectTypeExtensionNode
      | InterfaceTypeExtensionNode
@@ -905,8 +841,7 @@ use constant TypeExtensionNode =>
      | EnumTypeExtensionNode
      | InputObjectTypeExtensionNode;
 
-use constant ScalarTypeExtensionNode =>
-    type 'ScalarTypeExtensionNode',
+type 'ScalarTypeExtensionNode',
     as Dict[
        kind => Kind['SCALAR_TYPE_EXTENSION'],
        loc => Optional[ Location | Undef ],
@@ -914,8 +849,7 @@ use constant ScalarTypeExtensionNode =>
        directives => Optional[ ReadonlyArray[ConstDirectiveNode] | Undef],
     ];
 
-use constant ObjectTypeExtensionNode =>
-    type 'ObjectTypeExtensionNode',
+type 'ObjectTypeExtensionNode',
     as Dict[
        kind => Kind['OBJECT_TYPE_EXTENSION'],
        loc => Optional[ Location | Undef ],
@@ -925,8 +859,7 @@ use constant ObjectTypeExtensionNode =>
        fields => Optional[ ReadonlyArray[FieldDefinitionNode] | Undef],
     ];
 
-use constant InterfaceTypeExtensionNode =>
-    type 'InterfaceTypeExtensionNode',
+type 'InterfaceTypeExtensionNode',
     as Dict[
        kind => Kind['INTERFACE_TYPE_EXTENSION'],
        loc => Optional[ Location | Undef ],
@@ -936,8 +869,7 @@ use constant InterfaceTypeExtensionNode =>
        fields => Optional[ ReadonlyArray[FieldDefinitionNode] | Undef],
     ];
 
-use constant UnionTypeExtensionNode =>
-    type 'UnionTypeExtensionNode',
+type 'UnionTypeExtensionNode',
     as Dict[
        kind => Kind['UNION_TYPE_EXTENSION'],
        loc => Optional[ Location | Undef ],
@@ -946,8 +878,7 @@ use constant UnionTypeExtensionNode =>
        types => Optional[ ReadonlyArray[NamedTypeNode] | Undef],
     ];
 
-use constant EnumTypeExtensionNode =>
-    type 'EnumTypeExtensionNode',
+type 'EnumTypeExtensionNode',
     as Dict[
        kind => Kind['ENUM_TYPE_EXTENSION'],
        loc => Optional[ Location | Undef ],
@@ -956,8 +887,7 @@ use constant EnumTypeExtensionNode =>
        values => Optional[ ReadonlyArray[EnumValueDefinitionNode] | Undef],
     ];
 
-use constant InputObjectTypeExtensionNode =>
-    type 'InputObjectTypeExtensionNode',
+type 'InputObjectTypeExtensionNode',
     as Dict[
        kind => Kind['INPUT_OBJECT_TYPE_EXTENSION'],
        loc => Optional[ Location | Undef ],

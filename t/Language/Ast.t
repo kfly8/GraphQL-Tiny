@@ -3,14 +3,8 @@ use warnings;
 use Test::More;
 
 use GraphQL::Tiny::Language::Source qw(build_Source);
-use GraphQL::Tiny::Language::Ast qw(
-    Token
-    build_Token
-    Location
-    build_Location
-);
 
-my @Nodes = qw(
+my @nodes = qw(
     ASTNode
     NameNode
     DocumentNode
@@ -77,7 +71,11 @@ my @Nodes = qw(
     InputObjectTypeExtensionNode
 );
 
-use GraphQL::Tiny::Language::Ast @Nodes;
+use GraphQL::Tiny::Language::Ast (
+    qw(Token build_Token Location build_Location),
+);
+
+use GraphQL::Tiny::Language::Ast -types;
 
 subtest 'Token' => sub {
     isa_ok Token, 'Type::Tiny';
@@ -111,10 +109,15 @@ subtest 'build_Location' => sub {
     is $location->{source}, $source;
 };
 
-subtest 'ASTNode' => sub {
-    for my $Name (@Nodes) {
-        my $code = __PACKAGE__->can($Name);
-        isa_ok $code->(), 'Type::Tiny', $Name;
+subtest 'ASTKindToNode' => sub {
+    isa_ok ASTKindToNode, 'Type::Tiny';
+    ok ASTKindToNode->is_strictly_subtype_of('Dict');
+};
+
+subtest 'ASTNodes' => sub {
+    for my $name (@nodes) {
+        my $code = __PACKAGE__->can($name);
+        is $code->()->display_name, $name, $name;
     }
 };
 

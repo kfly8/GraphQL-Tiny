@@ -7,6 +7,8 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(TOKEN_KIND TokenKind);
 
+use Type::Library -base, -declare => qw(TokenKind);
+
 # An exported enum describing the different kinds of tokens that the
 # lexer emits.
 use constant TOKEN_KIND => {
@@ -35,6 +37,6 @@ use constant TOKEN_KIND => {
   COMMENT => 'Comment',
 };
 
-use constant TokenKind => type 'TokenKind', as Enum[ values %{ TOKEN_KIND() }];
+type 'TokenKind', as Enum[ values %{ TOKEN_KIND() }];
 
 1;

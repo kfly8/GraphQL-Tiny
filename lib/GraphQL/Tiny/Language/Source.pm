@@ -7,7 +7,9 @@ use GraphQL::Tiny::Utils::Type;
 use Carp qw(croak);
 use Exporter 'import';
 
-our @EXPORT_OK = qw(Source build_Source is_Source);
+our @EXPORT_OK = qw(build_Source is_Source);
+
+use Type::Library -base, -declare => qw(Source);
 
 use constant Location =>
     type 'Location',
@@ -21,13 +23,12 @@ use constant Location =>
 # For example, if the GraphQL input starts at line 40 in a file named `Foo.graphql`, it might
 # be useful for `name` to be `"Foo.graphql"` and location to be `{ line: 40, column: 1 }`.
 # The `line` and `column` properties in `locationOffset` are 1-indexed.
-use constant Source =>
-    type 'Source',
-        as Dict[
-            body => Str,
-            name => Str,
-            location_offset => Location,
-        ];
+type 'Source',
+    as Dict[
+        body => Str,
+        name => Str,
+        location_offset => Location,
+    ];
 
 sub build_Source {
     my ($body, $name, $location_offset) = @_;
