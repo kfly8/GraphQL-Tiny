@@ -15,6 +15,7 @@ our @EXPORT = qw(
     Null
     Slurpy
     Str
+    Unknown
 );
 
 use Type::Utils qw(type as);
@@ -31,5 +32,6 @@ use Types::Standard qw(
 );
 
 use constant Null => type 'Null', as Undef;
+use constant Unknown => type 'Unknown', as Any;
 
 1;
