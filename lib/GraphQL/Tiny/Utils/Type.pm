@@ -12,9 +12,9 @@ our @EXPORT = qw(
     Enum
     HashRef
     Int
+    Null
     Slurpy
     Str
-    Undef
 );
 
 use Type::Utils qw(type as);
@@ -29,5 +29,7 @@ use Types::Standard qw(
     Str
     Undef
 );
+
+use constant Null => type 'Null', as Undef;
 
 1;

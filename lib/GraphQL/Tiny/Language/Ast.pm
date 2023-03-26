@@ -47,8 +47,8 @@ use constant Token => do {
         # Tokens exist as nodes in a double-linked-list amongst all tokens
         # including ignored tokens. <SOF> is always the first node and <EOF>
         # the last.
-        prev => HashRef | Undef,
-        next => HashRef | Undef,
+        prev => HashRef | Null,
+        next => HashRef | Null,
     ];
 
     my $PrevToken;
@@ -66,8 +66,8 @@ use constant Token => do {
     };
 
     my $Token = type 'Token', as $BaseToken & Dict[
-        prev => $PrevToken | Undef,
-        next => $NextToken | Undef,
+        prev => $PrevToken | Null,
+        next => $NextToken | Null,
         Slurpy[Any]
     ];
 
