@@ -2,6 +2,7 @@ package GraphQL::Tiny::Language::Ast;
 use strict;
 use warnings;
 use GraphQL::Tiny::Utils::Assert;
+use GraphQL::Tiny::Utils::Type;
 
 use Exporter 'import';
 
@@ -13,9 +14,6 @@ our @EXPORT_OK = qw(
     build_Location
 );
 
-use Types::Common -types;
-use Type::Utils;
-
 use GraphQL::Tiny::Language::Kinds qw(Kind);
 use GraphQL::Tiny::Language::Source qw(Source);
 use GraphQL::Tiny::Language::TokenKind qw(TokenKind);
@@ -24,7 +22,7 @@ use GraphQL::Tiny::Language::TokenKind qw(TokenKind);
 # Represents a range of characters represented by a lexical token
 # within a Source.
 use constant Token => do {
-    my $BaseToken = declare 'BaseToken', as Dict[
+    my $BaseToken = type 'BaseToken', as Dict[
         # The kind of Token.
         kind => TokenKind,
 
@@ -54,20 +52,20 @@ use constant Token => do {
     ];
 
     my $PrevToken;
-    $PrevToken = declare 'PrevToken', as $BaseToken & sub {
+    $PrevToken = type 'PrevToken', as $BaseToken & sub {
         return 0 if defined $_->{prev} && !$PrevToken->check($_->{prev});
         return 0 if defined $_->{next} && !$BaseToken->check($_->{next});
         return 1;
     };
 
     my $NextToken;
-    $NextToken = declare 'NextToken', as $BaseToken & sub {
+    $NextToken = type 'NextToken', as $BaseToken & sub {
         return 0 if defined $_->{prev} && !$BaseToken->check($_->{prev});
         return 0 if defined $_->{next} && !$NextToken->check($_->{next});
         return 1;
     };
 
-    my $Token = declare 'Token', as $BaseToken & Dict[
+    my $Token = type 'Token', as $BaseToken & Dict[
         prev => $PrevToken | Undef,
         next => $NextToken | Undef,
         Slurpy[Any]
@@ -98,7 +96,7 @@ sub build_Token {
 # Contains a range of UTF-8 character offsets and token references that
 # identify the region of the source from which the AST derived.
 use constant Location =>
-    declare 'Location',
+    type 'Location',
     as Dict[
         # The character offset at which this Node begins.
         start => Int,

@@ -2,17 +2,15 @@ package GraphQL::Tiny::Language::Source;
 use strict;
 use warnings;
 use GraphQL::Tiny::Utils::Assert;
+use GraphQL::Tiny::Utils::Type;
 
+use Carp qw(croak);
 use Exporter 'import';
 
 our @EXPORT_OK = qw(Source build_Source is_Source);
 
-use Carp qw(croak);
-use Types::Common -types;
-use Type::Utils;
-
 use constant Location =>
-    declare 'Location',
+    type 'Location',
         as Dict[
             line => Int,
             column => Int,
@@ -24,7 +22,7 @@ use constant Location =>
 # be useful for `name` to be `"Foo.graphql"` and location to be `{ line: 40, column: 1 }`.
 # The `line` and `column` properties in `locationOffset` are 1-indexed.
 use constant Source =>
-    declare 'Source',
+    type 'Source',
         as Dict[
             body => Str,
             name => Str,

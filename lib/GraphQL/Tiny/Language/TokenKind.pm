@@ -1,13 +1,11 @@
 package GraphQL::Tiny::Language::TokenKind;
 use strict;
 use warnings;
+use GraphQL::Tiny::Utils::Type;
 
 use Exporter 'import';
 
 our @EXPORT_OK = qw(TOKEN_KIND TokenKind);
-
-use Types::Common -types;
-use Type::Utils;
 
 # An exported enum describing the different kinds of tokens that the
 # lexer emits.
@@ -37,8 +35,6 @@ use constant TOKEN_KIND => {
   COMMENT => 'Comment',
 };
 
-use constant TokenKind =>
-    declare 'TokenKind',
-    as Enum[ values %{ TOKEN_KIND() }];
+use constant TokenKind => type 'TokenKind', as Enum[ values %{ TOKEN_KIND() }];
 
 1;

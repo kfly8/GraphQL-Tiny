@@ -1,13 +1,11 @@
 package GraphQL::Tiny::Language::Kinds;
 use strict;
 use warnings;
+use GraphQL::Tiny::Utils::Type;
 
 use Exporter 'import';
 
 our @EXPORT_OK = qw(KIND Kind);
-
-use Types::Common -types;
-use Type::Utils;
 
 # The set of allowed kind values for AST nodes.
 use constant KIND => {
@@ -82,8 +80,6 @@ use constant KIND => {
   INPUT_OBJECT_TYPE_EXTENSION => 'InputObjectTypeExtension',
 };
 
-use constant Kind =>
-    declare 'Kind',
-    as Enum[ values %{ KIND() }];
+use constant Kind => type 'Kind', as Enum[ values %{ KIND() }];
 
 1;
