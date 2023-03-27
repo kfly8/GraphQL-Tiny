@@ -9,6 +9,8 @@ use GraphQL::Tiny::Language::Kinds qw(Kind KIND);
 our @EXPORT_OK = qw(
     build_token
     build_location
+
+    QueryDocumentKeys
 );
 
 use Type::Library -base, -declare => qw(
@@ -247,110 +249,107 @@ type 'ASTNode',
   | ErrorBoundaryNode
   | ListNullabilityOperatorNode;
 
-# TODO(port):
-#
 # @internal
-#export const QueryDocumentKeys: {
-#  [NodeT in ASTNode as NodeT['kind']]: ReadonlyArray<keyof NodeT>;
-#} = {
-#  Name: [],
-#
-#  Document: ['definitions'],
-#  OperationDefinition: [
-#    'name',
-#    'variableDefinitions',
-#    'directives',
-#    'selectionSet',
-#  ],
-#  VariableDefinition: ['variable', 'type', 'defaultValue', 'directives'],
-#  Variable: ['name'],
-#  SelectionSet: ['selections'],
-#  Field: [
-#    'alias',
-#    'name',
-#    'arguments',
-#    'directives',
-#    'selectionSet',
-#    // Note: Client Controlled Nullability is experimental and may be changed
-#    // or removed in the future.
-#    'nullabilityAssertion',
-#  ],
-#  Argument: ['name', 'value'],
-#  // Note: Client Controlled Nullability is experimental and may be changed
-#  // or removed in the future.
-#  ListNullabilityOperator: ['nullabilityAssertion'],
-#  NonNullAssertion: ['nullabilityAssertion'],
-#  ErrorBoundary: ['nullabilityAssertion'],
-#
-#  FragmentSpread: ['name', 'directives'],
-#  InlineFragment: ['typeCondition', 'directives', 'selectionSet'],
-#  FragmentDefinition: [
-#    'name',
-#    // Note: fragment variable definitions are deprecated and will removed in v17.0.0
-#    'variableDefinitions',
-#    'typeCondition',
-#    'directives',
-#    'selectionSet',
-#  ],
-#
-#  IntValue: [],
-#  FloatValue: [],
-#  StringValue: [],
-#  BooleanValue: [],
-#  NullValue: [],
-#  EnumValue: [],
-#  ListValue: ['values'],
-#  ObjectValue: ['fields'],
-#  ObjectField: ['name', 'value'],
-#
-#  Directive: ['name', 'arguments'],
-#
-#  NamedType: ['name'],
-#  ListType: ['type'],
-#  NonNullType: ['type'],
-#
-#  SchemaDefinition: ['description', 'directives', 'operationTypes'],
-#  OperationTypeDefinition: ['type'],
-#
-#  ScalarTypeDefinition: ['description', 'name', 'directives'],
-#  ObjectTypeDefinition: [
-#    'description',
-#    'name',
-#    'interfaces',
-#    'directives',
-#    'fields',
-#  ],
-#  FieldDefinition: ['description', 'name', 'arguments', 'type', 'directives'],
-#  InputValueDefinition: [
-#    'description',
-#    'name',
-#    'type',
-#    'defaultValue',
-#    'directives',
-#  ],
-#  InterfaceTypeDefinition: [
-#    'description',
-#    'name',
-#    'interfaces',
-#    'directives',
-#    'fields',
-#  ],
-#  UnionTypeDefinition: ['description', 'name', 'directives', 'types'],
-#  EnumTypeDefinition: ['description', 'name', 'directives', 'values'],
-#  EnumValueDefinition: ['description', 'name', 'directives'],
-#  InputObjectTypeDefinition: ['description', 'name', 'directives', 'fields'],
-#
-#  DirectiveDefinition: ['description', 'name', 'arguments', 'locations'],
-#
-#  SchemaExtension: ['directives', 'operationTypes'],
-#
-#  ScalarTypeExtension: ['name', 'directives'],
-#  ObjectTypeExtension: ['name', 'interfaces', 'directives', 'fields'],
-#  InterfaceTypeExtension: ['name', 'interfaces', 'directives', 'fields'],
-#  UnionTypeExtension: ['name', 'directives', 'types'],
-#  EnumTypeExtension: ['name', 'directives', 'values'],
-#  InputObjectTypeExtension: ['name', 'directives', 'fields'],
-#};
+# { [NodeT in ASTNode as NodeT['kind']]: ReadonlyArray<keyof NodeT>; }
+use constant QueryDocumentKeys => {
+  Name => [],
+
+  Document => ['definitions'],
+  OperationDefinition => [
+    'name',
+    'variableDefinitions',
+    'directives',
+    'selectionSet',
+  ],
+  VariableDefinition => ['variable', 'type', 'defaultValue', 'directives'],
+  Variable => ['name'],
+  SelectionSet => ['selections'],
+  Field => [
+    'alias',
+    'name',
+    'arguments',
+    'directives',
+    'selectionSet',
+    # Note => Client Controlled Nullability is experimental and may be changed
+    # or removed in the future.
+    'nullabilityAssertion',
+  ],
+  Argument => ['name', 'value'],
+  # Note => Client Controlled Nullability is experimental and may be changed
+  # or removed in the future.
+  ListNullabilityOperator => ['nullabilityAssertion'],
+  NonNullAssertion => ['nullabilityAssertion'],
+  ErrorBoundary => ['nullabilityAssertion'],
+
+  FragmentSpread => ['name', 'directives'],
+  InlineFragment => ['typeCondition', 'directives', 'selectionSet'],
+  FragmentDefinition => [
+    'name',
+    # Note => fragment variable definitions are deprecated and will removed in v17.0.0
+    'variableDefinitions',
+    'typeCondition',
+    'directives',
+    'selectionSet',
+  ],
+
+  IntValue => [],
+  FloatValue => [],
+  StringValue => [],
+  BooleanValue => [],
+  NullValue => [],
+  EnumValue => [],
+  ListValue => ['values'],
+  ObjectValue => ['fields'],
+  ObjectField => ['name', 'value'],
+
+  Directive => ['name', 'arguments'],
+
+  NamedType => ['name'],
+  ListType => ['type'],
+  NonNullType => ['type'],
+
+  SchemaDefinition => ['description', 'directives', 'operationTypes'],
+  OperationTypeDefinition => ['type'],
+
+  ScalarTypeDefinition => ['description', 'name', 'directives'],
+  ObjectTypeDefinition => [
+    'description',
+    'name',
+    'interfaces',
+    'directives',
+    'fields',
+  ],
+  FieldDefinition => ['description', 'name', 'arguments', 'type', 'directives'],
+  InputValueDefinition => [
+    'description',
+    'name',
+    'type',
+    'defaultValue',
+    'directives',
+  ],
+  InterfaceTypeDefinition => [
+    'description',
+    'name',
+    'interfaces',
+    'directives',
+    'fields',
+  ],
+  UnionTypeDefinition => ['description', 'name', 'directives', 'types'],
+  EnumTypeDefinition => ['description', 'name', 'directives', 'values'],
+  EnumValueDefinition => ['description', 'name', 'directives'],
+  InputObjectTypeDefinition => ['description', 'name', 'directives', 'fields'],
+
+  DirectiveDefinition => ['description', 'name', 'arguments', 'locations'],
+
+  SchemaExtension => ['directives', 'operationTypes'],
+
+  ScalarTypeExtension => ['name', 'directives'],
+  ObjectTypeExtension => ['name', 'interfaces', 'directives', 'fields'],
+  InterfaceTypeExtension => ['name', 'interfaces', 'directives', 'fields'],
+  UnionTypeExtension => ['name', 'directives', 'types'],
+  EnumTypeExtension => ['name', 'directives', 'values'],
+  InputObjectTypeExtension => ['name', 'directives', 'fields'],
+};
 
 # TODO(port)
 # const kindValues = new Set<string>(Object.keys(QueryDocumentKeys));
@@ -501,9 +500,9 @@ type 'FragmentSpreadNode',
 
 type 'InlineFragmentNode',
     as Dict[
-       kind => Kind['FRAGMENT_SPREAD'],
+       kind => Kind['INLINE_FRAGMENT'],
        loc => Optional[ Location | Undef ],
-       typeConditions => Optional[ NamedTypeNode | Undef ],
+       typeCondition => Optional[ NamedTypeNode | Undef ],
        directives => Optional[ ReadonlyArray[DirectiveNode] | Undef ],
        selectionSet => SelectionSetNode,
     ];
@@ -589,28 +588,28 @@ type 'ListValueNode',
     as Dict[
        kind => Kind['LIST'],
        loc => Optional[ Location | Undef ],
-       value => ReadonlyArray[ValueNode],
+       values => ReadonlyArray[ValueNode],
     ];
 
 type 'ConstListValueNode',
     as Dict[
        kind => Kind['LIST'],
        loc => Optional[ Location | Undef ],
-       value => ReadonlyArray[ConstValueNode],
+       values => ReadonlyArray[ConstValueNode],
     ];
 
 type 'ObjectValueNode',
     as Dict[
        kind => Kind['OBJECT'],
        loc => Optional[ Location | Undef ],
-       value => ReadonlyArray[ObjectFieldNode],
+       fields => ReadonlyArray[ObjectFieldNode],
     ];
 
 type 'ConstObjectValueNode',
     as Dict[
        kind => Kind['OBJECT'],
        loc => Optional[ Location | Undef ],
-       value => ReadonlyArray[ConstObjectFieldNode],
+       fields => ReadonlyArray[ConstObjectFieldNode],
     ];
 
 type 'ObjectFieldNode',
@@ -717,6 +716,7 @@ type 'ObjectTypeDefinitionNode',
        loc => Optional[ Location | Undef ],
        description => Optional[ StringValueNode | Undef ],
        name => NameNode,
+       interfaces => Optional[ ReadonlyArray[NamedTypeNode] | Undef ],
        directives => Optional[ ReadonlyArray[ConstDirectiveNode] | Undef ],
        fields => Optional[ ReadonlyArray[FieldDefinitionNode] | Undef ],
     ];

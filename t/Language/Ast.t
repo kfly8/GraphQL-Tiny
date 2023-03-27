@@ -2,12 +2,14 @@ use strict;
 use warnings;
 use Test::More;
 
+use GraphQL::Tiny::Utils::Type;
 use GraphQL::Tiny::Language::Source qw(build_source);
 
 use GraphQL::Tiny::Language::Ast qw(
     Token build_token Location build_location
     ASTNode ASTKindToNode
     NameNode DocumentNode
+    QueryDocumentKeys
 );
 
 use GraphQL::Tiny::Language::Ast -types;
@@ -61,6 +63,29 @@ subtest 'ASTKindToNode' => sub {
     my %params = @{ASTKindToNode->parent->parameters};
     is $params{Name}, NameNode;
     is $params{Document}, DocumentNode;
+};
+
+subtest 'QueryDocumentKeys' => sub {
+
+    # { [NodeT in ASTNode as NodeT['kind']]: ReadonlyArray<keyof NodeT>; }
+    for my $Node (@{ASTNode->parent->type_constraints}) {
+        my $Type = ASTNode->library->get_type($Node);
+
+        my @params = @{$Type->parent->parameters};
+        my %params = @params;
+
+        my $Kind = $params{kind};
+        my $key = $Kind->parent->values->[0];
+
+        my @node_keys;
+        for (my $i = 0; $i < @params; $i += 2) {
+            push @node_keys => $params[$i];
+        }
+
+        my $KeyofNode = ReadonlyArray[ Enum[@node_keys] ];
+        ok($KeyofNode->check(QueryDocumentKeys->{$key}), $key)
+            or note explain $KeyofNode->validate(QueryDocumentKeys->{$key});
+    }
 };
 
 done_testing;
