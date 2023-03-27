@@ -248,20 +248,6 @@ type 'ASTNode',
   | ListNullabilityOperatorNode;
 
 # TODO(port):
-# Utility type listing all nodes indexed by their kind.
-type 'ASTKindToNode', as Dict[];
-#    my @dict;
-#    for my $Node (@{ASTNode->parent->type_constraints}) {
-#        my $Kind = $Node->parent->parameters->[1];
-#        my $key = $Kind->parameters->[0];
-#
-#        push @dict => (KIND->{$key}, $Node);
-#    }
-#
-#    as Dict[@dict];
-#};
-
-# TODO(port):
 #
 # @internal
 #export const QueryDocumentKeys: {
@@ -895,5 +881,22 @@ type 'InputObjectTypeExtensionNode',
        directives => Optional[ ReadonlyArray[ConstDirectiveNode] | Undef],
        fields => Optional[ ReadonlyArray[InputValueDefinitionNode] | Undef],
     ];
+
+
+# Utility type listing all nodes indexed by their kind.
+type 'ASTKindToNode', do {
+    my @dict;
+    for my $Node (@{ASTNode->parent->type_constraints}) {
+        my $Type = __PACKAGE__->meta->get_type($Node);
+
+        my %params = @{$Type->parent->parameters};
+        my $Kind = $params{kind};
+        my $key = $Kind->parent->values->[0];
+
+        push @dict => ($key, $Node);
+    }
+
+    as Dict[@dict];
+};
 
 1;

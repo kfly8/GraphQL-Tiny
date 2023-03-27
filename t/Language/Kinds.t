@@ -17,7 +17,8 @@ subtest 'Kind' => sub {
     subtest 'kind key is given' => sub {
         my $Type = Kind['NAME'];
         isa_ok $Type, 'Type::Tiny';
-        is $Type->display_name, 'Kind[NAME]';
+        is $Type->display_name, 'Kind_NAME';
+        is $Type->parent, 'Enum["Name"]';
 
         ok $Type->check('Name');
         ok !$Type->check('Document');

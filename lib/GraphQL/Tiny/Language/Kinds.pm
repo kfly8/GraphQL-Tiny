@@ -83,19 +83,7 @@ use constant KIND => {
 
 my $Kind = type 'Kind', as Enum[ values %{ KIND() } ];
 
-my $KindItem = type 'KindItem', as Str,
-    name_generator => sub {
-        my (undef, $kind) = @_;
-        sprintf 'Kind[%s]', $kind;
-    },
-    constraint_generator => sub {
-        my ($kind) = @_;
-        return sub {
-            $_ eq KIND->{$kind}
-        }
-    };
-
-my %KindMap = map { $_ => $KindItem->of($_) } keys %{ KIND() };
+my %KindMap = map { $_ => type "Kind_$_", as Enum[ KIND->{$_} ] } keys %{ KIND() };
 
 sub Kind(;$) {
     unless (@_) {

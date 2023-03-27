@@ -4,81 +4,18 @@ use Test::More;
 
 use GraphQL::Tiny::Language::Source qw(build_source);
 
-my @nodes = qw(
-    ASTNode
-    NameNode
-    DocumentNode
-    DefinitionNode
-    ExecutableDefinitionNode
-    OperationDefinitionNode
-    OperationTypeNode
-    VariableDefinitionNode
-    VariableNode
-    SelectionSetNode
-    SelectionNode
-    FieldNode
-    NullabilityAssertionNode
-    ListNullabilityOperatorNode
-    NonNullAssertionNode
-    ErrorBoundaryNode
-    ArgumentNode
-    ConstArgumentNode
-    FragmentSpreadNode
-    InlineFragmentNode
-    FragmentDefinitionNode
-    ValueNode
-    ConstValueNode
-    IntValueNode
-    FloatValueNode
-    StringValueNode
-    BooleanValueNode
-    NullValueNode
-    EnumValueNode
-    ListValueNode
-    ConstListValueNode
-    ObjectValueNode
-    ConstObjectValueNode
-    ObjectFieldNode
-    ConstObjectFieldNode
-    DirectiveNode
-    ConstDirectiveNode
-    TypeNode
-    NamedTypeNode
-    ListTypeNode
-    NonNullTypeNode
-    TypeSystemDefinitionNode
-    SchemaDefinitionNode
-    OperationTypeDefinitionNode
-    TypeDefinitionNode
-    ScalarTypeDefinitionNode
-    ObjectTypeDefinitionNode
-    FieldDefinitionNode
-    InputValueDefinitionNode
-    InterfaceTypeDefinitionNode
-    UnionTypeDefinitionNode
-    EnumTypeDefinitionNode
-    EnumValueDefinitionNode
-    InputObjectTypeDefinitionNode
-    DirectiveDefinitionNode
-    TypeSystemExtensionNode
-    SchemaExtensionNode
-    TypeExtensionNode
-    ScalarTypeExtensionNode
-    ObjectTypeExtensionNode
-    InterfaceTypeExtensionNode
-    UnionTypeExtensionNode
-    EnumTypeExtensionNode
-    InputObjectTypeExtensionNode
-);
-
-use GraphQL::Tiny::Language::Ast (
-    qw(Token build_token Location build_location),
+use GraphQL::Tiny::Language::Ast qw(
+    Token build_token Location build_location
+    ASTNode ASTKindToNode
+    NameNode DocumentNode
 );
 
 use GraphQL::Tiny::Language::Ast -types;
 
 subtest 'Token' => sub {
     isa_ok Token, 'Type::Tiny';
+    ok Token->parent->is_strictly_subtype_of('Dict');
+    is Token, 'Token';
 };
 
 subtest 'build_token' => sub {
@@ -94,6 +31,8 @@ subtest 'build_token' => sub {
 
 subtest 'Location' => sub {
     isa_ok Location, 'Type::Tiny';
+    ok Location->parent->is_strictly_subtype_of('Dict');
+    is Location, 'Location';
 };
 
 subtest 'build_location' => sub {
@@ -109,16 +48,19 @@ subtest 'build_location' => sub {
     is $location->{source}, $source;
 };
 
+subtest 'ASTNode' => sub {
+    isa_ok ASTNode, 'Type::Tiny';
+    isa_ok ASTNode->parent, 'Type::Tiny::Union';
+    is ASTNode, 'ASTNode';
+};
+
 subtest 'ASTKindToNode' => sub {
     isa_ok ASTKindToNode, 'Type::Tiny';
     ok ASTKindToNode->is_strictly_subtype_of('Dict');
-};
 
-subtest 'ASTNodes' => sub {
-    for my $name (@nodes) {
-        my $code = __PACKAGE__->can($name);
-        is $code->()->display_name, $name, $name;
-    }
+    my %params = @{ASTKindToNode->parent->parameters};
+    is $params{Name}, NameNode;
+    is $params{Document}, DocumentNode;
 };
 
 done_testing;
