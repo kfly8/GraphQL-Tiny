@@ -171,10 +171,10 @@ type 'Location',
         end => Int,
 
         # The Token at which this Node begins.
-        start_token => Token,
+        startToken => Token,
 
         # The Token at which this Node ends.
-        end_token => Token,
+        endToken => Token,
 
         # The Source document the AST represents.
         source => Source,
@@ -192,8 +192,8 @@ sub build_location {
     my $location = {};
     $location->{start} = $start_token->{start};
     $location->{end} = $end_token->{end};
-    $location->{start_token} = $start_token;
-    $location->{end_token} = $end_token;
+    $location->{startToken} = $start_token;
+    $location->{endToken} = $end_token;
     $location->{source} = $source;
     return $location;
 }
@@ -396,7 +396,7 @@ type 'OperationDefinitionNode',
         name => Optional[ NameNode | Undef ],
         variableDefinitions => Optional[ ReadonlyArray[VariableDefinitionNode] | Undef ],
         directives => Optional[ ReadonlyArray[DirectiveNode] | Undef ],
-        selection_set => SelectionSetNode
+        selectionSet => SelectionSetNode
     ];
 
 use constant OPERATION_TYPE_NODE => {
@@ -414,7 +414,7 @@ type 'VariableDefinitionNode',
         loc => Optional[ Location | Undef ],
         variable => VariableNode,
         type => TypeNode,
-        default_value => Optional[ ConstValueNode | Undef ],
+        defaultValue => Optional[ ConstValueNode | Undef ],
         directives => Optional[ ReadonlyArray[ConstDirectiveNode] | Undef ],
     ];
 
@@ -443,7 +443,7 @@ type 'FieldNode',
         arguments => Optional[ReadonlyArray[ArgumentNode] | Undef],
         # Note: Client Controlled Nullability is experimental
         # and may be changed or removed in the future.
-        nullability_assertion => Optional[ NullabilityAssertionNode | Undef ],
+        nullabilityAssertion => Optional[ NullabilityAssertionNode | Undef ],
         directives => Optional[ ReadonlyArray[DirectiveNode] | Undef ],
         selectionSet => Optional[ SelectionSetNode | Undef ],
     ];
@@ -457,21 +457,21 @@ type 'ListNullabilityOperatorNode',
     as Dict[
         kind => Kind['LIST_NULLABILITY_OPERATOR'],
         loc => Optional[ Location | Undef ],
-        nullability_assertion => Optional[ NullabilityAssertionNode | Undef ],
+        nullabilityAssertion => Optional[ NullabilityAssertionNode | Undef ],
     ];
 
 type 'NonNullAssertionNode',
     as Dict[
         kind => Kind['NON_NULL_ASSERTION'],
         loc => Optional[ Location | Undef ],
-        nullability_assertion => Optional[ ListNullabilityOperatorNode | Undef ],
+        nullabilityAssertion => Optional[ ListNullabilityOperatorNode | Undef ],
     ];
 
 type 'ErrorBoundaryNode',
     as Dict[
        kind => Kind['ERROR_BOUNDARY'],
        loc => Optional[ Location | Undef ],
-       nullability_assertion => Optional[ ListNullabilityOperatorNode | Undef ],
+       nullabilityAssertion => Optional[ ListNullabilityOperatorNode | Undef ],
     ];
 
 type 'ArgumentNode',
@@ -503,9 +503,9 @@ type 'InlineFragmentNode',
     as Dict[
        kind => Kind['FRAGMENT_SPREAD'],
        loc => Optional[ Location | Undef ],
-       type_conditions => Optional[ NamedTypeNode | Undef ],
+       typeConditions => Optional[ NamedTypeNode | Undef ],
        directives => Optional[ ReadonlyArray[DirectiveNode] | Undef ],
-       selection_set => SelectionSetNode,
+       selectionSet => SelectionSetNode,
     ];
 
 type 'FragmentDefinitionNode',
@@ -515,10 +515,10 @@ type 'FragmentDefinitionNode',
        name => NameNode,
 
        # @deprecated variableDefinitions will be removed in v17.0.0 */
-       variable_definitions => Optional[ ReadonlyArray[VariableDefinitionNode] | Undef ],
-       type_condition => NamedTypeNode,
+       variableDefinitions => Optional[ ReadonlyArray[VariableDefinitionNode] | Undef ],
+       typeCondition => NamedTypeNode,
        directives => Optional[ ReadonlyArray[DirectiveNode] | Undef ],
-       selection_set => SelectionSetNode,
+       selectionSet => SelectionSetNode,
     ];
 
 # Values
@@ -682,7 +682,7 @@ type 'SchemaDefinitionNode',
        loc => Optional[ Location | Undef ],
        description => Optional[ StringValueNode | Undef ],
        directives => Optional[ ReadonlyArray[ConstDirectiveNode] | Undef ],
-       operation_types => ReadonlyArray[OperationTypeDefinitionNode],
+       operationTypes => ReadonlyArray[OperationTypeDefinitionNode],
    ];
 
 type 'OperationTypeDefinitionNode',
@@ -740,7 +740,7 @@ type 'InputValueDefinitionNode',
        description => Optional[ StringValueNode | Undef ],
        name => NameNode,
        type => TypeNode,
-       default_value => Optional[ ConstValueNode | Undef ],
+       defaultValue => Optional[ ConstValueNode | Undef ],
        directives => Optional[ ReadonlyArray[ConstDirectiveNode] | Undef ],
     ];
 
@@ -815,7 +815,7 @@ type 'SchemaExtensionNode',
        kind => Kind['SCHEMA_EXTENSION'],
        loc => Optional[ Location | Undef ],
        directives => Optional[ ReadonlyArray[ConstDirectiveNode] | Undef],
-       operation_types => Optional[ ReadonlyArray[OperationTypeDefinitionNode] | Undef ],
+       operationTypes => Optional[ ReadonlyArray[OperationTypeDefinitionNode] | Undef ],
    ];
 
 # Type Extensions

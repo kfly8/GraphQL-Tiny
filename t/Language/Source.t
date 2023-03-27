@@ -19,8 +19,8 @@ subtest 'build_source' => sub {
 
         is $source->{body}, 'my body';
         is $source->{name}, 'GraphQL request';
-        is $source->{location_offset}{line}, 1;
-        is $source->{location_offset}{column}, 1;
+        is $source->{locationOffset}{line}, 1;
+        is $source->{locationOffset}{column}, 1;
     };
 
     subtest 'set location_offset' => sub {
@@ -33,8 +33,8 @@ subtest 'build_source' => sub {
 
         is $source->{body}, 'my body';
         is $source->{name}, 'my name';
-        is $source->{location_offset}{line}, 123;
-        is $source->{location_offset}{column}, 456;
+        is $source->{locationOffset}{line}, 123;
+        is $source->{locationOffset}{column}, 456;
     };
 
     subtest 'rejects invalid locationOffset' => sub {

@@ -43,8 +43,8 @@ subtest 'build_location' => sub {
     my $location = build_location($start_token, $end_token, $source);
     is $location->{start}, 1;
     is $location->{end}, 3;
-    is $location->{start_token}, $start_token;
-    is $location->{end_token}, $end_token;
+    is $location->{startToken}, $start_token;
+    is $location->{endToken}, $end_token;
     is $location->{source}, $source;
 };
 

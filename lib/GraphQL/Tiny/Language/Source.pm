@@ -26,7 +26,7 @@ type 'Source',
     as Dict[
         body => Str,
         name => Str,
-        location_offset => $Location,
+        locationOffset => $Location,
     ];
 
 sub build_source {
@@ -35,14 +35,14 @@ sub build_source {
     my $source = {};
     $source->{body} = $body;
     $source->{name} = $name // 'GraphQL request';
-    $source->{location_offset} = $location_offset // { line => 1, column => 1 };
+    $source->{locationOffset} = $location_offset // { line => 1, column => 1 };
 
     if (ASSERT) {
-        unless ($source->{location_offset}{line} > 0) {
+        unless ($source->{locationOffset}{line} > 0) {
             croak 'line in locationOffset is 1-indexed and must be positive.',
         }
 
-        unless ($source->{location_offset}{column} > 0) {
+        unless ($source->{locationOffset}{column} > 0) {
             croak 'column in locationOffset is 1-indexed and must be positive.',
         }
 
