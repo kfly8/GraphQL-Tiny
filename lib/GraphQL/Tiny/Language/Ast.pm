@@ -163,6 +163,8 @@ sub build_token {
     return $token;
 }
 
+# TODO(port): to_JSON($token)
+
 # Contains a range of UTF-8 character offsets and token references that
 # identify the region of the source from which the AST derived.
 type 'Location',
@@ -200,6 +202,8 @@ sub build_location {
     $location->{source} = $source;
     return $location;
 }
+
+# TODO(port): to_JSON($location)
 
 # The list of all possible AST node types.
 type 'ASTNode',
