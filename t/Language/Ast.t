@@ -10,6 +10,7 @@ use GraphQL::Tiny::Language::Ast qw(
     ASTNode ASTKindToNode
     NameNode DocumentNode
     QueryDocumentKeys
+    is_Node
 );
 
 use GraphQL::Tiny::Language::Ast -types;
@@ -86,6 +87,13 @@ subtest 'QueryDocumentKeys' => sub {
         ok($KeyofNode->check(QueryDocumentKeys->{$key}), $key)
             or note explain $KeyofNode->validate(QueryDocumentKeys->{$key});
     }
+};
+
+subtest 'is_Node' => sub {
+    ok is_Node({ kind => 'Name', value => 'foo' }), 'NameNode is Node';
+    ok is_Node({ kind => 'Variable', value => 'bar' }), 'VariableNode is Node';
+
+    ok !is_Node({ kind => 'Nameee', value => 'foo' }), 'NameeeNode is NOT Node';
 };
 
 done_testing;

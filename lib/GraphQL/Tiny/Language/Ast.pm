@@ -11,6 +11,7 @@ our @EXPORT_OK = qw(
     build_location
 
     QueryDocumentKeys
+    is_Node
 );
 
 use Type::Library -base, -declare => qw(
@@ -351,16 +352,15 @@ use constant QueryDocumentKeys => {
   InputObjectTypeExtension => ['name', 'directives', 'fields'],
 };
 
-# TODO(port)
-# const kindValues = new Set<string>(Object.keys(QueryDocumentKeys));
+#const kindValues = new Set<string>(Object.keys(QueryDocumentKeys));
+my %KIND_VALUES = map { $_ => 1 } keys %{ QueryDocumentKeys() };
 
-# TODO(port)
 # @internal
-# export function isNode(maybeNode: any): maybeNode is ASTNode {
-#   const maybeKind = maybeNode?.kind;
-#   return typeof maybeKind === 'string' && kindValues.has(maybeKind);
-# }
-
+sub is_Node {
+    my ($maybe_node) = @_;
+    my $maybe_kind = $maybe_node->{kind} // '';
+    exists $KIND_VALUES{$maybe_kind};
+}
 
 # Name
 type 'NameNode',
