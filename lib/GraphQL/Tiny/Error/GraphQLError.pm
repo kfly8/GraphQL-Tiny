@@ -3,9 +3,7 @@ use strict;
 use warnings;
 use GraphQL::Tiny::Utils::Type;
 
-use Exporter 'import';
-
-our @EXPORT_OK = qw(
+use Type::Library -base, -declare => qw(
     GraphQLErrorExtensions
 );
 
@@ -18,8 +16,7 @@ our @EXPORT_OK = qw(
 # the risk of conflicts. We recommend you add at most one extension field,
 # an object which can contain all the values you need.
 #
-use constant GraphQLErrorExtensions =>
-    type 'GraphQLErrorExtensions',
+type 'GraphQLErrorExtensions',
     as Dict[
         attributeName => Unknown,
     ];
