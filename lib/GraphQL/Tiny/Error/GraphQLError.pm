@@ -7,6 +7,9 @@ use Type::Library -base, -declare => qw(
     GraphQLErrorExtensions
 );
 
+use GraphQL::Tiny::Language::Ast qw(ASTNode);
+use GraphQL::Tiny::Language::Source qw(Source);
+
 #
 # Custom extensions
 #
@@ -19,6 +22,16 @@ use Type::Library -base, -declare => qw(
 type 'GraphQLErrorExtensions',
     as Dict[
         attributeName => Unknown,
+    ];
+
+type 'GraphQLErrorOptions',
+    as Dict[
+        nodes => Optional[ ReadonlyArray[ASTNode] | ASTNode | Null | Undef ],
+        source => Optional[ Maybe[Source] ],
+        positions => Optional[ Maybe[ReadonlyArray[Int]] ],
+        path => Optional[ Maybe[ReadonlyArray[Str | Int]] ],
+        originalError => Optional[ Maybe[ Error & Dict[extensions => Optional[Unknown], Slurpy[Any]] ] ],
+        extensions => Optional[ Maybe[GraphQLErrorExtensions] ],
     ];
 
 1;
