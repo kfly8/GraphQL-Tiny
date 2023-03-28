@@ -12,6 +12,32 @@ subtest 'type and as' => sub {
     ok $Type->is_strictly_subtype_of(Any);
 };
 
+subtest 'Error' => sub {
+    isa_ok Error, 'Type::Tiny';
+    is Error->display_name, 'Error';
+    my $Dict = Error->parent;
+    my %params = @{$Dict->parameters};
+
+    ok $params{name};
+    ok $params{message};
+    ok $params{stack};
+
+    ok Error->check({name => 'RangeError', message => 'The argument must be an "apple"', stack => '...'});
+
+    subtest 'Error type can be extended.' => sub {
+        my $Type = Error & Dict[myinfo => Str, Slurpy[Any]];
+
+        ok $Type->check(
+            {
+                name => 'MyError',
+                message => 'some message',
+                stack => '...',
+                myinfo => 'hello!',
+            }
+        );
+    };
+};
+
 subtest 'Null' => sub {
     isa_ok Null, 'Type::Tiny';
     is Null->display_name, 'Null';
