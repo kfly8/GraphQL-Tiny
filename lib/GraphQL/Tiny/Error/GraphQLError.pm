@@ -1,7 +1,7 @@
 package GraphQL::Tiny::Error::GraphQLError;
 use strict;
 use warnings;
-use GraphQL::Tiny::Utils::Type;
+use GraphQL::Tiny::Utils::Type -all;
 
 use Type::Library -base, -declare => qw(
     GraphQLErrorExtensions

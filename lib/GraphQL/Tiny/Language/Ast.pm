@@ -2,7 +2,7 @@ package GraphQL::Tiny::Language::Ast;
 use strict;
 use warnings;
 use GraphQL::Tiny::Utils::Assert;
-use GraphQL::Tiny::Utils::Type;
+use GraphQL::Tiny::Utils::Type -all;
 
 use GraphQL::Tiny::Language::Kinds qw(Kind KIND);
 

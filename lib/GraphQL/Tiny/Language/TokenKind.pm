@@ -1,7 +1,7 @@
 package GraphQL::Tiny::Language::TokenKind;
 use strict;
 use warnings;
-use GraphQL::Tiny::Utils::Type;
+use GraphQL::Tiny::Utils::Type -all;
 
 use Exporter 'import';
 
