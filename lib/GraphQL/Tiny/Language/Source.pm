@@ -5,7 +5,6 @@ use GraphQL::Tiny::Utils::Assert;
 use GraphQL::Tiny::Utils::Type -all;
 
 use Carp qw(croak);
-use Exporter 'import';
 
 our @EXPORT_OK = qw(build_source is_Source);
 

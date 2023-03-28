@@ -3,8 +3,6 @@ use strict;
 use warnings;
 use GraphQL::Tiny::Utils::Type -all;
 
-use Exporter 'import';
-
 our @EXPORT_OK = qw(TOKEN_KIND TokenKind);
 
 use Type::Library -base, -declare => qw(TokenKind);
