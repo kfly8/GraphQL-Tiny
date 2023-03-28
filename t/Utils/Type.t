@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use GraphQL::Tiny::Utils::Type;
+use GraphQL::Tiny::Utils::Type -all;
 
 subtest 'type and as' => sub {
     my $Type = type 'Foo', as Any;
