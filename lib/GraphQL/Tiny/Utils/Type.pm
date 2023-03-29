@@ -9,7 +9,6 @@ use Type::Library -base, -declare => qw(
     Bool
     Dict
     Enum
-    Error
     HashRef
     Int
     Maybe
@@ -36,14 +35,6 @@ __PACKAGE__->meta->add_type(Types::Standard::Optional);
 __PACKAGE__->meta->add_type(Types::Standard::Slurpy);
 __PACKAGE__->meta->add_type(Types::Standard::Str);
 __PACKAGE__->meta->add_type(Types::Standard::Undef);
-
-type 'Error',
-    as Dict[
-        name    => Str,
-        message => Str,
-        stack   => Str,
-        Slurpy[Any],
-    ];
 
 type 'Null', as Types::Standard::Undef;
 
