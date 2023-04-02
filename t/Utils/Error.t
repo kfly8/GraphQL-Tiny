@@ -3,13 +3,13 @@ use warnings;
 use Test::More;
 
 use GraphQL::Tiny::Utils::Type -all;
-use GraphQL::Tiny::Utils::Error -all;
+use GraphQL::Tiny::Utils::Error qw(Error build_error);
 
 subtest 'Error' => sub {
     isa_ok Error, 'Type::Tiny';
     is Error->display_name, 'Error';
     my $Dict = Error->parent;
-    my %params = @{$Dict->parameters};
+    my %params = @{$Dict->parameters}[0..5];
 
     ok $params{name};
     ok $params{message};
