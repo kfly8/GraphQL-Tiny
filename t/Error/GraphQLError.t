@@ -38,4 +38,18 @@ subtest 'GraphQLErrorOptions' => sub {
     ok $params{extensions};
 };
 
+subtest 'GraphQLError' => sub {
+    isa_ok GraphQLError, 'Type::Tiny';
+    is GraphQLError, 'GraphQLError';
+
+    my ($Error, $Dict) = @{GraphQLError->parent->type_constraints};
+    is $Error, Error;
+    ok $Dict->is_strictly_subtype_of('Dict');
+};
+
+subtest 'build_graphql_error' => sub {
+    my $graphql_error = build_graphql_error('some message');
+    ok GraphQLError->check($graphql_error);
+};
+
 done_testing;

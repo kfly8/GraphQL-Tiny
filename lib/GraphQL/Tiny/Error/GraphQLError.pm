@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use GraphQL::Tiny::Utils::Assert;
 use GraphQL::Tiny::Utils::Type -all;
-use GraphQL::Tiny::Utils::Error -all;
+use GraphQL::Tiny::Utils::Error qw(Error build_error);
 
 our @EXPORT_OK = qw(build_graphql_error);
 
@@ -138,7 +138,7 @@ sub build_graphql_error {
           ? [ map { get_location($source, $_) } @{$positions} ]
           : $node_locations ? [ map { get_location($_->{source}, $_->{start}) } @{$node_locations} ] : undef;
 
-    my $original_extensions = HashRef->check($original_error ? $original_error->{extensions} : undef)
+    my $original_extensions = ref $original_error && ref $original_error eq 'HASH' && $original_error->{extensions}
         ? $original_error->{extensions}
         : undef;
 
@@ -157,4 +157,3 @@ sub undefined_if_empty {
 }
 
 1;
-
