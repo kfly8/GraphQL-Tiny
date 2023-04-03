@@ -11,6 +11,7 @@ use Type::Library -base, -declare => qw(
     Enum
     HashRef
     Int
+    Map
     Maybe
     Null
     Optional
@@ -30,6 +31,7 @@ __PACKAGE__->meta->add_type(Types::Standard::Dict);
 __PACKAGE__->meta->add_type(Types::Standard::Enum);
 __PACKAGE__->meta->add_type(Types::Standard::HashRef);
 __PACKAGE__->meta->add_type(Types::Standard::Int);
+__PACKAGE__->meta->add_type(Types::Standard::Map);
 __PACKAGE__->meta->add_type(Types::Standard::Maybe);
 __PACKAGE__->meta->add_type(Types::Standard::Optional);
 __PACKAGE__->meta->add_type(Types::Standard::Slurpy);
@@ -38,7 +40,7 @@ __PACKAGE__->meta->add_type(Types::Standard::Undef);
 
 type 'Null', as Types::Standard::Undef;
 
-type 'Unknown', as Types::Standard::Any;
+type 'Unknown', as Types::Standard::Defined;
 
 type 'ReadonlyArray', as Types::Standard::ArrayRef,
     name_generator => sub {

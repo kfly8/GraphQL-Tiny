@@ -2,17 +2,26 @@ use strict;
 use warnings;
 use Test::More;
 
-use GraphQL::Tiny::Utils::Type -types;
-use GraphQL::Tiny::Error::GraphQLError qw(GraphQLErrorExtensions GraphQLErrorOptions);
+use GraphQL::Tiny::Utils::Error qw(Error);
+use GraphQL::Tiny::Error::GraphQLError qw(
+    GraphQLErrorExtensions
+    GraphQLErrorOptions
+    GraphQLError
+    build_graphql_error
+);
 
 subtest 'GraphQLErrorExtensions' => sub {
     isa_ok GraphQLErrorExtensions, 'Type::Tiny';
     is GraphQLErrorExtensions, 'GraphQLErrorExtensions';
 
-    my $Dict = GraphQLErrorExtensions->parent;
-    my %params = @{$Dict->parameters};
+    ok GraphQLErrorExtensions->check({});
+    ok GraphQLErrorExtensions->check({foo => 'string!'});
+    ok GraphQLErrorExtensions->check({foo => 123 });
+    ok GraphQLErrorExtensions->check({foo => {bar => 123}});
 
-    ok $params{attributeName};
+    # invalid cases
+    ok !GraphQLErrorExtensions->check({foo => undef});
+    ok !GraphQLErrorExtensions->check([]);
 };
 
 subtest 'GraphQLErrorOptions' => sub {

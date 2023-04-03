@@ -27,8 +27,8 @@ use GraphQL::Tiny::Language::Location qw(SourceLocation get_location);
 # an object which can contain all the values you need.
 #
 type 'GraphQLErrorExtensions',
-    as Dict[
-        attributeName => Unknown,
+    as Map[
+        Str, Unknown
     ];
 
 type 'GraphQLErrorOptions',
