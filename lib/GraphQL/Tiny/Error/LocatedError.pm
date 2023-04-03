@@ -5,7 +5,6 @@ use GraphQL::Tiny::Utils::Assert;
 use GraphQL::Tiny::Utils::Type -all;
 use GraphQL::Tiny::Utils::Error qw(to_error);
 
-use GraphQL::Tiny::Language::AST qw(ASTNode);
 use GraphQL::Tiny::Error::GraphQLError qw(build_graphql_error GraphQLError);
 
 use Exporter 'import';
@@ -19,14 +18,16 @@ sub located_error {
     my ($raw_original_error, $nodes, $path) = @_;
 
     if (ASSERT) {
-        Unkown->assert_valid($raw_original_error);
+        Unknown->assert_valid($raw_original_error);
 
-        my $NodesType = ASTNode() | ReadonlyArray[ASTNode] | Undef | Null;
+        # (perl) Loose types are used because this block is executed with the ASTNode type undefined.
+        # my $NodesType = ASTNode | ReadonlyArray[ASTNode] | Undef | Null
+        my $Node = Dict[kind => Str, Slurpy[Any]];
+        my $NodesType = $Node | ReadonlyArray[$Node] | Undef | Null;
         $NodesType->assert_valid($nodes);
 
-        if (defined $path) {
-            ReadonlyArray[Str|Int]->assert_valid($path);
-        }
+        my $Path = ReadonlyArray[Str|Int];
+        $Path->assert_valid($path) if $path;
     }
 
     my $original_error = to_error($raw_original_error);
@@ -36,20 +37,20 @@ sub located_error {
         return $original_error;
     }
 
-    return build_graphql_error(
+    return build_graphql_error($original_error->{message}, {
         nodes => ($original_error->{nodes} // $nodes),
         source => $original_error->{source},
         positions => $original_error->{positions},
         path => $path,
-        original_error => $original_error,
-    );
+        originalError => $original_error,
+    });
 }
 
 # @return error is GraphQLError
 sub is_located_graphql_error {
     my ($error) = @_;
 
-    # (original) Array.isArray(error.path);
+    # (graphql-js) Array.isArray(error.path);
     return ref $error && ref $error eq 'HASH' && ref $error->{path} && ref $error->{path} eq 'ARRAY';
 }
 
