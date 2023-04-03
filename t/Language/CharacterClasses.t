@@ -8,6 +8,8 @@ use GraphQL::Tiny::Language::CharacterClasses qw(
   is_letter
   is_name_start
   is_name_continue
+
+  REGEX_NAME
 );
 
 subtest 'is_white_space' => sub {
@@ -76,6 +78,16 @@ subtest 'is_name_continue' => sub {
     ok !is_name_continue(0x005B), 'should return false for [ (U+005B)';
     ok !is_name_continue(0x0060), 'should return false for ` (U+0060)';
     ok !is_name_continue(0x007B), 'should return false for { (U+007B)';
+};
+
+subtest 'REGEX_NAME' => sub {
+    like 'foo', REGEX_NAME, 'should match foo';
+    like '_bar', REGEX_NAME, 'should match _bar';
+    like 'baz1', REGEX_NAME, 'should match baz1';
+    like 'qux_2', REGEX_NAME, 'should match qux_2';
+
+    unlike '3quux', REGEX_NAME, 'should not match 3quux';
+    unlike 'corge!', REGEX_NAME, 'should not match corge!';
 };
 
 done_testing;

@@ -4,7 +4,7 @@ use warnings;
 use utf8;
 
 use GraphQL::Tiny::Error::GraphQLError qw(build_graphql_error);
-use GraphQL::Tiny::Language::CharacterClasses qw(is_name_start is_name_continue);
+use GraphQL::Tiny::Language::CharacterClasses qw(REGEX_NAME);
 
 use Carp qw(croak);
 
@@ -23,17 +23,10 @@ sub assert_name {
         croak build_graphql_error('Expected name to be a non-empty string.');
     }
 
-    for (my $i = 1; $i < length $name; $i++) {
-        if (!is_name_continue(ord substr $name, $i, 1)) {
-            croak build_graphql_error(
-                "Names must only contain [_a-zA-Z0-9] but \"$name\" does not."
-            );
-        }
-    }
-
-    if (!is_name_start(ord substr $name, 0, 1)) {
+    # XXX Use regular expressions instead of faithful porting for performance
+    if ($name !~ REGEX_NAME) {
         croak build_graphql_error(
-            "Names must start with [_a-zA-Z] but \"$name\" does not."
+            "Names must start with [_a-zA-Z] and only contain [_a-zA-Z0-9] but \"$name\" does not."
         );
     }
 

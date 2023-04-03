@@ -17,11 +17,11 @@ subtest 'assert_name' => sub {
 
     eval { assert_name('aå') };
     ok GraphQLError->check($@);
-    is $@->{message}, 'Names must only contain [_a-zA-Z0-9] but "aå" does not.';
+    is $@->{message}, 'Names must start with [_a-zA-Z] and only contain [_a-zA-Z0-9] but "aå" does not.';
 
     eval { assert_name('1foo') };
     ok GraphQLError->check($@);
-    is $@->{message}, 'Names must start with [_a-zA-Z] but "1foo" does not.';
+    is $@->{message}, 'Names must start with [_a-zA-Z] and only contain [_a-zA-Z0-9] but "1foo" does not.';
 };
 
 subtest 'assert_enum_value_name' => sub {
@@ -48,11 +48,11 @@ subtest 'assert_enum_value_name' => sub {
 
     eval { assert_enum_value_name('aå') };
     ok GraphQLError->check($@);
-    is $@->{message}, 'Names must only contain [_a-zA-Z0-9] but "aå" does not.';
+    is $@->{message}, 'Names must start with [_a-zA-Z] and only contain [_a-zA-Z0-9] but "aå" does not.';
 
     eval { assert_enum_value_name('1foo') };
     ok GraphQLError->check($@);
-    is $@->{message}, 'Names must start with [_a-zA-Z] but "1foo" does not.';
+    is $@->{message}, 'Names must start with [_a-zA-Z] and only contain [_a-zA-Z0-9] but "1foo" does not.';
 };
 
 done_testing;

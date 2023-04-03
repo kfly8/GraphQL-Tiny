@@ -5,11 +5,13 @@ use warnings;
 use Exporter 'import';
 
 our @EXPORT_OK = qw(
-  is_white_space
-  is_digit
-  is_letter
-  is_name_start
-  is_name_continue
+    is_white_space
+    is_digit
+    is_letter
+    is_name_start
+    is_name_continue
+
+    REGEX_NAME
 );
 
 # ```
@@ -71,5 +73,7 @@ sub is_name_continue {
     my ($code) = @_;
     return is_letter($code) || is_digit($code) || $code == 0x005f;
 }
+
+use constant REGEX_NAME => qr/^[_A-Za-z][_0-9A-Za-z]*$/;
 
 1;
