@@ -5,11 +5,17 @@ use GraphQL::Tiny::Utils::Assert;
 use GraphQL::Tiny::Utils::Type -all;
 use GraphQL::Tiny::Utils::Error qw(to_error);
 
+use GraphQL::Tiny::Language::Ast qw(ASTNode);
 use GraphQL::Tiny::Error::GraphQLError qw(build_graphql_error GraphQLError);
 
 use Exporter 'import';
 
 our @EXPORT_OK = qw(located_error);
+
+use Type::Library -base, -declare => qw(LocatedErrorArgsNodes);
+
+type 'LocatedErrorArgsNodes',
+    as Maybe[ReadonlyArray[ASTNode] | ASTNode | Null | Undef];
 
 # Given an arbitrary value, presumably thrown while attempting to execute a
 # GraphQL operation, produce a new GraphQLError aware of the location in the
@@ -20,11 +26,7 @@ sub located_error {
     if (ASSERT) {
         Unknown->assert_valid($raw_original_error);
 
-        # (perl) Loose types are used because this block is executed with the ASTNode type undefined.
-        # my $NodesType = ASTNode | ReadonlyArray[ASTNode] | Undef | Null
-        my $Node = Dict[kind => Str, Slurpy[Any]];
-        my $NodesType = $Node | ReadonlyArray[$Node] | Undef | Null;
-        $NodesType->assert_valid($nodes);
+        LocatedErrorArgsNodes->assert_valid($nodes);
 
         my $Path = ReadonlyArray[Str|Int];
         $Path->assert_valid($path) if $path;
