@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 use GraphQL::Tiny::Utils::Type -all;
-use GraphQL::Tiny::Utils::Error qw(Error build_error);
+use GraphQL::Tiny::Utils::Error qw(Error build_error to_error);
 
 subtest 'Error' => sub {
     isa_ok Error, 'Type::Tiny';
@@ -37,6 +37,26 @@ subtest 'build_error' => sub {
     ok Error->check($error);
     is $error->{name}, 'Error';
     is $error->{message}, 'some message';
+};
+
+subtest 'to_error' => sub  {
+
+    subtest 'Error argument is given' => sub {
+        my $error = to_error(build_error('some_message'));
+
+        ok Error->check($error);
+        is $error->{name}, 'Error';
+        is $error->{message}, 'some_message';
+    };
+
+    subtest 'Unkown argument is given' => sub {
+        my $error = to_error({ error => 'some message' });
+
+        ok Error->check($error);
+        is $error->{name}, 'NonErrorThrown';
+        is $error->{message}, "Unexpected error value: {'error' => 'some message'}";
+        is $error->{thrown_value}->{error}, 'some message';
+    };
 };
 
 done_testing;
