@@ -1,6 +1,8 @@
-package GraphQL::Tiny::Type::CharacterClasses;
+package GraphQL::Tiny::Language::CharacterClasses;
 use strict;
 use warnings;
+
+use Exporter 'import';
 
 our @EXPORT_OK = qw(
   is_white_space
