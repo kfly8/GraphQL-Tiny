@@ -3,11 +3,13 @@ use warnings;
 use Test::More;
 
 use GraphQL::Tiny::Utils::Error qw(Error);
+use GraphQL::Tiny::Error::GraphQLError qw(build_graphql_error);
+
 use GraphQL::Tiny::Error::GraphQLError qw(
     GraphQLErrorExtensions
     GraphQLErrorOptions
     GraphQLError
-    build_graphql_error
+    GraphQLFormattedError
 );
 
 subtest 'GraphQLErrorExtensions' => sub {
@@ -50,6 +52,18 @@ subtest 'GraphQLError' => sub {
 subtest 'build_graphql_error' => sub {
     my $graphql_error = build_graphql_error('some message');
     ok GraphQLError->check($graphql_error);
+};
+
+subtest 'GraphQLFormattedError' => sub {
+    isa_ok GraphQLFormattedError, 'Type::Tiny';
+    is GraphQLFormattedError, 'GraphQLFormattedError';
+
+    my $Dict = GraphQLFormattedError->parent;
+    my %params = @{$Dict->parameters};
+    ok $params{message};
+    ok $params{locations};
+    ok $params{path};
+    ok $params{extensions};
 };
 
 done_testing;

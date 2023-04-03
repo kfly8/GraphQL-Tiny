@@ -11,6 +11,7 @@ use Type::Library -base, -declare => qw(
     GraphQLErrorExtensions
     GraphQLErrorOptions
     GraphQLError
+    GraphQLFormattedError
 );
 
 use GraphQL::Tiny::Language::Ast qw(ASTNode);
@@ -151,9 +152,37 @@ sub build_graphql_error {
     return $error;
 }
 
+# TODO(port): toString
+# TODO(port): toJSON
+
 sub undefined_if_empty {
     my ($array) = @_;
     return !defined $array || @$array == 0 ? undef : $array;
 }
+
+#
+# See: https://spec.graphql.org/draft/#sec-Errors
+#
+type 'GraphQLFormattedError',
+    as Dict[
+        # A short, human-readable summary of the problem that **SHOULD NOT** change
+        # from occurrence to occurrence of the problem, except for purposes of
+        # localization.
+        message => Str,
+
+        # If an error can be associated to a particular point in the requested
+        # GraphQL document, it should contain a list of locations.
+        locations => Optional[ ReadonlyArray[SourceLocation] ],
+
+        # If an error can be associated to a particular field in the GraphQL result,
+        # it _must_ contain an entry with the key `path` that details the path of
+        # the response field which experienced the error. This allows clients to
+        # identify whether a null result is intentional or caused by a runtime error.
+        path => Optional[ ReadonlyArray[Str | Int] ],
+
+        # Reserved for implementors to extend the protocol however they see fit,
+        # and hence there are no additional restrictions on its contents.
+        extensions => Optional[ Map[Str, Unknown] ],
+    ];
 
 1;
