@@ -7,6 +7,7 @@ our @EXPORT = qw(type as);
 use Type::Library -base, -declare => qw(
     Any
     Bool
+    CodeRef
     Dict
     Enum
     HashRef
@@ -27,6 +28,7 @@ use Types::Standard ();
 
 __PACKAGE__->meta->add_type(Types::Standard::Any);
 __PACKAGE__->meta->add_type(Types::Standard::Bool);
+__PACKAGE__->meta->add_type(Types::Standard::CodeRef);
 __PACKAGE__->meta->add_type(Types::Standard::Dict);
 __PACKAGE__->meta->add_type(Types::Standard::Enum);
 __PACKAGE__->meta->add_type(Types::Standard::HashRef);
