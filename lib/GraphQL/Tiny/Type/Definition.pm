@@ -80,6 +80,9 @@ use Type::Library
         ThunkReadonlyArray
         ThunkObjMap
 
+        GraphQLScalarTypeExtensions
+        GraphQLObjectTypeExtensions
+
         GraphQLScalarSerializer GraphQLScalarValueParser GraphQLScalarLiteralParser
         GraphQLScalarTypeConfig GraphQLScalarTypeNormalizedConfig
 
@@ -118,6 +121,7 @@ use Type::Library
         GraphQLEnumTypeNormalizedConfig
         GraphQLEnumValueExtensions
         GraphQLEnumValueConfig
+        GraphQLEnumValueConfigMap
         GraphQLEnumValue
 
         GraphQLInputObjectTypeExtensions
@@ -175,6 +179,9 @@ use GraphQL::Tiny::Type::AssertName qw(assert_enum_value_name assert_name);
 # TODO(port): type/schema
 #use GraphQL::Tiny::Type::Schema qw(GraphQLSchema);
 sub GraphQLSchema;
+
+# TODO(port): jsutils/Path
+sub Path;
 
 # Predicates & Assertions
 
@@ -308,7 +315,6 @@ sub assert_non_null_type {
     }
     return $type;
 }
-
 
 # These types may be used as input types for arguments and directives.
 type 'GraphQLNullableInputType', as
@@ -475,7 +481,7 @@ sub build_graphql_list {
 # })
 # ```
 # Note: the enforcement of non-nullability occurs within the executor.
-type 'GraphQLNonNull', as Dict[ofType => GraphQLNullableType];
+type 'GraphQLNonNull', as Dict[ofType => GraphQLNullableType],
     name_generator => sub {
         my ($type_name, $param) = @_;
         sprintf '%s[%s]', $type_name, $param;
@@ -1625,7 +1631,7 @@ type 'GraphQLTypeEnumConfig',
         description => Optional[Str],
         values => GraphQLEnumValueConfigMap,
         extensions => Optional[GraphQLEnumTypeExtensions | Undef | Null], # Readonly
-        astNode => Optional[EnumTypeDefinitionNode | Undef | NUll],
+        astNode => Optional[EnumTypeDefinitionNode | Undef | Null],
         extensionASTNodes => Optional[ReadonlyArray[EnumTypeExtensionNode] | Undef | Null],
     ];
 
