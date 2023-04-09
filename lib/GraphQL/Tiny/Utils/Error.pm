@@ -1,7 +1,6 @@
 package GraphQL::Tiny::Utils::Error;
 use strict;
 use warnings;
-use GraphQL::Tiny::Utils::Assert;
 use GraphQL::Tiny::Utils::Type -all;
 
 our @EXPORT_OK = qw(build_error to_error);
@@ -28,10 +27,6 @@ sub build_error {
         message => $message,
         stack => longmess(),
     };
-
-    if (ASSERT) {
-        Error->assert_valid($error);
-    }
 
     return $error;
 }

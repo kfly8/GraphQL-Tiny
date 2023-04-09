@@ -1,10 +1,8 @@
 package GraphQL::Tiny::Language::Source;
 use strict;
 use warnings;
-use GraphQL::Tiny::Utils::Assert;
+use GraphQL::Tiny::Utils::DevAssert qw(ASSERT dev_assert);
 use GraphQL::Tiny::Utils::Type -all;
-
-use Carp qw(croak);
 
 our @EXPORT_OK = qw(build_source is_Source);
 
@@ -31,20 +29,28 @@ type 'Source',
 sub build_source {
     my ($body, $name, $location_offset) = @_;
 
+    if (ASSERT) {
+        Str->assert_valid($body);
+        Str->assert_valid($name) if defined $name;
+        $Location->assert_valid($location_offset) if defined $location_offset;
+    }
+
     my $source = {};
     $source->{body} = $body;
     $source->{name} = $name // 'GraphQL request';
     $source->{locationOffset} = $location_offset // { line => 1, column => 1 };
 
+    dev_assert(
+        $source->{locationOffset}{line} > 0,
+        'line in locationOffset is 1-indexed and must be positive.',
+    );
+
+    dev_assert(
+        $source->{locationOffset}{column} > 0,
+        'column in locationOffset is 1-indexed and must be positive.',
+    );
+
     if (ASSERT) {
-        unless ($source->{locationOffset}{line} > 0) {
-            croak 'line in locationOffset is 1-indexed and must be positive.',
-        }
-
-        unless ($source->{locationOffset}{column} > 0) {
-            croak 'column in locationOffset is 1-indexed and must be positive.',
-        }
-
         Source->assert_valid($source);
     }
 

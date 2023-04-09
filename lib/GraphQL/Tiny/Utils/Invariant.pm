@@ -1,7 +1,7 @@
 package GraphQL::Tiny::Utils::Invariant;
 use strict;
 use warnings;
-use GraphQL::Tiny::Utils::Assert;
+use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
 use GraphQL::Tiny::Utils::Error qw(build_error);
 
 use Carp qw(croak);

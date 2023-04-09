@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 
-use GraphQL::Tiny::Utils::Assert;
+use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
 use GraphQL::Tiny::Utils::Type -all;
 use GraphQL::Tiny::Utils::Invariant qw(invariant);
 

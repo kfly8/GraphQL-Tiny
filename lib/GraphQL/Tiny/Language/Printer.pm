@@ -1,7 +1,7 @@
 package GraphQL::Tiny::Language::Printer;
 use strict;
 use warnings;
-use GraphQL::Tiny::Utils::Assert;
+use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
 use GraphQL::Tiny::Utils::Type -all;
 
 use Exporter 'import';

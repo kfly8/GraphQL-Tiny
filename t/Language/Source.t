@@ -40,22 +40,22 @@ subtest 'build_source' => sub {
     subtest 'rejects invalid locationOffset' => sub {
         {
             eval { build_source('', '', { line => 0, column => 1 }) };
-            like $@, qr/^line in locationOffset is 1-indexed and must be positive./
+            like $@->{message}, qr/^line in locationOffset is 1-indexed and must be positive./
         }
 
         {
             eval { build_source('', '', { line => -1, column => 1 }) };
-            like $@, qr/^line in locationOffset is 1-indexed and must be positive./
+            like $@->{message}, qr/^line in locationOffset is 1-indexed and must be positive./
         }
 
         {
             eval { build_source('', '', { line => 1, column => 0 }) };
-            like $@, qr/^column in locationOffset is 1-indexed and must be positive./
+            like $@->{message}, qr/^column in locationOffset is 1-indexed and must be positive./
         }
 
         {
             eval { build_source('', '', { line => 1, column => -1 }) };
-            like $@, qr/^column in locationOffset is 1-indexed and must be positive./
+            like $@->{message}, qr/^column in locationOffset is 1-indexed and must be positive./
         }
     };
 };

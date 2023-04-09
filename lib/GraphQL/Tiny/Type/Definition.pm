@@ -5,7 +5,7 @@ use feature qw(state);
 
 use Carp qw(croak);
 
-use GraphQL::Tiny::Utils::Assert;
+use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
 use GraphQL::Tiny::Utils::Type -all;
 use GraphQL::Tiny::Utils::Error qw(build_error);
 use GraphQL::Tiny::Utils::Path qw(Path);
