@@ -2,7 +2,7 @@ package GraphQL::Tiny::Utils::IdentityFunc;
 use strict;
 use warnings;
 
-use Exporter qw(import);
+use Exporter 'import';
 
 our @EXPORT_OK = qw(identity_func);
 

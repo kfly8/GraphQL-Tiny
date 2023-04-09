@@ -1,10 +1,18 @@
 package GraphQL::Tiny::Type::Definition;
 use strict;
 use warnings;
+use feature qw(state);
+
+use Carp qw(croak);
+
 use GraphQL::Tiny::Utils::Assert;
 use GraphQL::Tiny::Utils::Type -all;
 use GraphQL::Tiny::Utils::Error qw(build_error);
-use Carp qw(croak);
+use GraphQL::Tiny::Utils::Path qw(Path);
+use GraphQL::Tiny::Utils::IdentityFunc qw(identity_func);
+use GraphQL::Tiny::Utils::ToObjMap qw(to_obj_map);
+
+use GraphQL::Tiny::Error::GraphQLError qw(build_graphql_error);
 
 our @EXPORT_OK = qw(
     is_type              assert_type
@@ -139,11 +147,6 @@ use Type::Library
 # TODO(port): inspect
 sub inspect;
 
-# TODO(port)
-sub identity_func;
-
-use GraphQL::Tiny::Error::GraphQLError qw(build_graphql_error);
-
 use GraphQL::Tiny::Language::Ast qw(
     EnumTypeDefinitionNode
     EnumTypeExtensionNode
@@ -172,16 +175,13 @@ use GraphQL::Tiny::Language::Kinds qw(KIND);
 sub print;
 
 # TODO(port): language/value_from_ast_untyped
-sub value_from_ast_untyped;
+sub value_from_ast_untyped { ... };
 
 use GraphQL::Tiny::Type::AssertName qw(assert_enum_value_name assert_name);
 
 # TODO(port): type/schema
 #use GraphQL::Tiny::Type::Schema qw(GraphQLSchema);
-sub GraphQLSchema;
-
-# TODO(port): jsutils/Path
-sub Path;
+sub GraphQLSchema { Str };
 
 # Predicates & Assertions
 
@@ -317,13 +317,15 @@ sub assert_non_null_type {
 }
 
 # These types may be used as input types for arguments and directives.
-type 'GraphQLNullableInputType', as
-    GraphQLNamedInputType
-  | GraphQLList[GraphQLInputType];
+type 'GraphQLNullableInputType', where {
+    state $Type = GraphQLNamedInputType | GraphQLList[GraphQLInputType];
+    $Type->check($_);
+};
 
-type 'GraphQLInputType', as
-    GraphQLNullableInputType
-  | GraphQLNonNull[GraphQLNullableInputType];
+type 'GraphQLInputType', where {
+    state $Type = GraphQLNullableInputType | GraphQLNonNull[GraphQLNullableInputType];
+    $Type->check($_);
+};
 
 
 sub is_input_type {
@@ -345,13 +347,15 @@ sub assert_input_type {
 }
 
 # These types may be used as output types as the result of fields.
-type 'GraphQLNullableOutputType', as
-    GraphQLNamedOutputType
-  | GraphQLList[GraphQLOutputType];
+type 'GraphQLNullableOutputType', where {
+    state $Type = GraphQLNamedOutputType | GraphQLList[GraphQLOutputType];
+    $Type->check($_);
+};
 
-type 'GraphQLOutputType', as
-    GraphQLNullableOutputType
-  | GraphQLNonNull[GraphQLNullableOutputType];
+type 'GraphQLOutputType', where {
+    state $Type = GraphQLNullableOutputType | GraphQLNonNull[GraphQLNullableOutputType];
+    $Type->check($_);
+};
 
 sub is_output_type {
     my ($type) = @_;
@@ -443,15 +447,17 @@ sub assert_abstract_type {
 #   })
 # })
 # ```
-type 'GraphQLList', as Dict[ofType => GraphQLType],
+type 'GraphQLList', as Dict,
     name_generator => sub {
         my ($type_name, $param) = @_;
         sprintf '%s[%s]', $type_name, $param;
     },
     constraint_generator => sub {
         my ($param) = @_;
-        # TODO implement this
-        my $Type = Types::Standard::ArrayRef->of($param);
+        if (ASSERT) {
+            GraphQLType->is_a_type_of($param) or croak 'Invalid type' . "$param";
+        }
+        my $Type = Dict[ofType => ArrayRef[$param]];
         return sub { $Type->check(@_) }
     };
 
@@ -481,15 +487,17 @@ sub build_graphql_list {
 # })
 # ```
 # Note: the enforcement of non-nullability occurs within the executor.
-type 'GraphQLNonNull', as Dict[ofType => GraphQLNullableType],
+type 'GraphQLNonNull', as Dict,
     name_generator => sub {
         my ($type_name, $param) = @_;
         sprintf '%s[%s]', $type_name, $param;
     },
     constraint_generator => sub {
         my ($param) = @_;
-        # TODO implement this
-        my $Type = Types::Standard::ArrayRef->of($param);
+        if (ASSERT) {
+            GraphQLNullableType->is_a_type_of($param) or croak 'Invalid type' . "$param";
+        }
+        my $Type = Dict[ofType => $param];
         return sub { $Type->check(@_) }
     };
 
@@ -503,9 +511,10 @@ sub build_graphql_non_null {
 
 # These types wrap and modify other types
 
-type 'GraphQLWrappingType', as
-    GraphQLList[GraphQLType]
-  | GraphQLNonNull[GraphQLNullableType];
+type 'GraphQLWrappingType', where {
+    state $Type = GraphQLList[GraphQLType] | GraphQLNonNull[GraphQLNullableType];
+    $Type->check($_);
+};
 
 sub is_wrapping_type {
     my ($type) = @_;
@@ -521,7 +530,10 @@ sub assert_wrapping_type {
 }
 
 # These types can all accept null as a value.
-type 'GraphQLNullableType', as GraphQLNamedType | GraphQLList[GraphQLType];
+type 'GraphQLNullableType', where {
+    state $Type = GraphQLNamedType | GraphQLList[GraphQLType];
+    $Type->check($_);
+};
 
 sub is_nullable_type {
     my ($type) = @_;
@@ -691,13 +703,13 @@ sub build_graphql_scalar_type {
         GraphQLScalarTypeConfig->assert_valid($config);
     }
 
-    my $parse_value = $config->{parseValue} // identity_func();
+    my $parse_value = $config->{parseValue} // \&identity_func;
 
     my $type = {};
     $type->{name} = assert_name($config->{name});
     $type->{description} = $config->{description};
     $type->{specifiedByURL} = $config->{specifiedByURL};
-    $type->{serialize} = $config->{serialize} // identity_func();
+    $type->{serialize} = $config->{serialize} // \&identity_func;
     $type->{parseValue} = $parse_value;
     $type->{parseLiteral} = $config->{parseLiteral} // sub {
         my ($node, $variables) = @_;
@@ -751,9 +763,9 @@ type 'GraphQLScalarTypeConfig',
         extensionASTNodes => Optional[ Maybe[ReadonlyArray[ScalarTypeExtensionNode]] ],
     ];
 
+# TODO(port) extends => 'GraphQLScalarTypeConfig',
 type 'GraphQLScalarTypeNormalizedConfig',
     as Dict[
-        extends => 'GraphQLScalarTypeConfig',
         serialize => GraphQLScalarSerializer,
         parseValue => GraphQLScalarValueParser,
         parseLiteral => GraphQLScalarLiteralParser,

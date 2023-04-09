@@ -2,10 +2,11 @@ package GraphQL::Tiny::Utils::Type;
 use strict;
 use warnings;
 
-our @EXPORT = qw(type as);
+our @EXPORT = qw(type as where);
 
 use Type::Library -base, -declare => qw(
     Any
+    ArrayRef
     Bool
     CodeRef
     Dict
@@ -23,10 +24,11 @@ use Type::Library -base, -declare => qw(
     Unknown
 );
 
-use Type::Utils qw(type as);
+use Type::Utils qw(type as where);
 use Types::Standard ();
 
 __PACKAGE__->meta->add_type(Types::Standard::Any);
+__PACKAGE__->meta->add_type(Types::Standard::ArrayRef);
 __PACKAGE__->meta->add_type(Types::Standard::Bool);
 __PACKAGE__->meta->add_type(Types::Standard::CodeRef);
 __PACKAGE__->meta->add_type(Types::Standard::Dict);
