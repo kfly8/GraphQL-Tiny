@@ -18,30 +18,33 @@ subtest 'Path' => sub {
     ok !Path->check({ prev => undef, key => 'first' });
 };
 
-subtest 'add_path' => sub {
-    my $path = add_path(undef, 'first', 'Hoge');
+subtest 'it can create a Path' => sub {
+    my $first = add_path(undef, 1, 'First');
 
-    note 'test $path';
-    is $path->{prev}, undef;
-    is $path->{key}, 'first';
-    is $path->{typename}, 'Hoge';
-
-    my $next_path = add_path($path, 'second', 'Fuga');
-
-    note 'test $next_path';
-    is $next_path->{prev}, $path;
-    is $next_path->{key}, 'second';
-    is $next_path->{typename}, 'Fuga';
+    is $first->{prev}, undef;
+    is $first->{key}, 1;
+    is $first->{typename}, 'First';
 };
 
-subtest 'path_to_array' => sub {
-    my $path = add_path(undef, 'first', 'Hoge');
-    my $next_path = add_path($path, 'second', 'Fuga');
+subtest 'it can add a new key to an existing Path' => sub {
+    my $first = add_path(undef, 1, 'First');
+    my $second = add_path($first, 'two', 'Second');
 
-    my $array = path_to_array($next_path);
-    is scalar @$array, 2;
-    is $array->[0], 'first';
-    is $array->[1], 'second';
+    is $second->{prev}, $first;
+    is $second->{key}, 'two';
+    is $second->{typename}, 'Second';
+};
+
+subtest 'it can convert a Path to an array of its keys' => sub {
+    my $root = add_path(undef, 0, 'Root');
+    my $first = add_path($root, 'one', 'First');
+    my $second = add_path($first, 2, 'Second');
+
+    my $path = path_to_array($second);
+    is scalar @$path, 3;
+    is $path->[0], 0;
+    is $path->[1], 'one';
+    is $path->[2], 2;
 };
 
 done_testing;
