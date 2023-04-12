@@ -70,17 +70,17 @@ type 'Single',
     };
 
 sub of_union_types {
-    my ($Union) = @_;
+    my ($Union, $Original) = @_;
 
     if (!$Union->isa('Type::Tiny::Union') && $Union->has_parent) {
-        return of_union_types($Union->parent);
+        return of_union_types($Union->parent, $Union);
     }
 
     die "invalid type: $Union" unless $Union->isa('Type::Tiny::Union');
 
     my @Types;
     for my $T ( @{ $Union->type_constraints } ) {
-        my $Type = $T->isa('Type::Tiny::_DeclaredType') ? $Union->library->meta->get_type($T) : $T;
+        my $Type = $T->isa('Type::Tiny::_DeclaredType') ? $Original->library->meta->get_type($T) : $T;
         push @Types => $Type;
     }
     return @Types
