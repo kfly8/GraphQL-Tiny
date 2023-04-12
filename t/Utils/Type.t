@@ -36,4 +36,23 @@ subtest 'ReadonlyArray' => sub {
     ok $Type->check([1,2,3]);
 };
 
+subtest 'Single' => sub {
+    my $Type = Single["hoge"];
+    isa_ok $Type, 'Type::Tiny';
+
+    is $Type->display_name, 'Single[hoge]';
+    ok $Type->check("hoge");
+    ok !$Type->check("hoge!");
+};
+
+subtest 'of_union_types' => sub {
+    is_deeply [ of_union_types(Str | Int)], [Str, Int];
+
+    my $Union = type 'MyUnion', as Str | Int;
+    is_deeply [ of_union_types($Union)], [Str, Int];
+
+    eval { of_union_types(Str) };
+    ok $@;
+};
+
 done_testing;

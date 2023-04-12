@@ -2,7 +2,7 @@ package GraphQL::Tiny::Utils::Type;
 use strict;
 use warnings;
 
-our @EXPORT = qw(type as where);
+our @EXPORT = qw(type as where of_union_types);
 
 use Type::Library -base, -declare => qw(
     Any
@@ -20,6 +20,7 @@ use Type::Library -base, -declare => qw(
     ReadonlyArray
     Slurpy
     Str
+    Single
     Undef
     Unknown
 );
@@ -56,5 +57,33 @@ type 'ReadonlyArray', as Types::Standard::ArrayRef,
         my $Type = Types::Standard::ArrayRef->of($param);
         return sub { $Type->check(@_) }
     };
+
+type 'Single',
+    constraint_generator => sub {
+        my ($param) = @_;
+        if (Types::Standard::Num->check($param)) {
+            return sub { $_ == $param }
+        }
+        else {
+            return sub { $_ eq $param }
+        }
+    };
+
+sub of_union_types {
+    my ($Union) = @_;
+
+    if (!$Union->isa('Type::Tiny::Union') && $Union->has_parent) {
+        return of_union_types($Union->parent);
+    }
+
+    die "invalid type: $Union" unless $Union->isa('Type::Tiny::Union');
+
+    my @Types;
+    for my $T ( @{ $Union->type_constraints } ) {
+        my $Type = $T->isa('Type::Tiny::_DeclaredType') ? $Union->library->meta->get_type($T) : $T;
+        push @Types => $Type;
+    }
+    return @Types
+}
 
 1;
