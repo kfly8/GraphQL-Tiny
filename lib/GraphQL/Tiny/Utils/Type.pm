@@ -1,6 +1,7 @@
 package GraphQL::Tiny::Utils::Type;
 use strict;
 use warnings;
+use feature qw(current_sub);
 
 our @EXPORT = qw(
     type
@@ -79,13 +80,12 @@ type 'Single',
     };
 
 # type constraints in a Union type
-sub constraints_of_union :prototype($;$);
 sub constraints_of_union :prototype($;$) {
     my ($Union, $Original) = @_;
     $Original //= $Union;
 
     if (!$Union->isa('Type::Tiny::Union') && $Union->has_parent) {
-        return constraints_of_union($Union->parent, $Original);
+        return __SUB__->($Union->parent, $Original);
     }
 
     die "invalid type: $Original"
@@ -109,12 +109,11 @@ sub constraints_of_union :prototype($;$) {
 }
 
 # all values in an Enum type
-sub values_of_enum :prototype($);
 sub values_of_enum :prototype($) {
     my ($Enum) = @_;
 
     if (!$Enum->isa('Type::Tiny::Enum') && $Enum->has_parent) {
-        return values_of_enum($Enum->parent);
+        return __SUB__->($Enum->parent);
     }
 
     die "invalid type: $Enum"
@@ -130,19 +129,18 @@ sub value_of_enum :prototype($) {
 }
 
 # Parameters of Dict type
-sub parameters_of_dict :prototype($;$$);
 sub parameters_of_dict :prototype($;$$) {
     my ($Dict, $key, $Original) = @_;
     $Original //= $Dict;
 
     if ($key) {
-        my %params = @{ parameters_of_dict($Dict, undef, $Original) };
+        my %params = @{ __SUB__->($Dict, undef, $Original) };
         die "cannot find key: $key in $Original" unless $params{$key};
         return $params{$key};
     }
 
     if (!$Dict->is_parameterized && $Dict->has_parent) {
-        return parameters_of_dict($Dict->parent, $key, $Original);
+        return __SUB__->($Dict->parent, $key, $Original);
     }
 
     die "invalid type: $Original"
