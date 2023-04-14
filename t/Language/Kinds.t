@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use GraphQL::Tiny::Language::Kinds qw(KIND Kind);
+use GraphQL::Tiny::Language::Kinds qw(Kind);
 
 subtest 'Kind' => sub {
     subtest 'no argument' => sub {
@@ -29,10 +29,6 @@ subtest 'Kind' => sub {
         eval { Kind['Name'] };
         like $@, qr/Cannot find kind: Name/
     };
-};
-
-subtest 'KIND' => sub {
-    ok KIND->{NAME}, 'Name';
 };
 
 done_testing;

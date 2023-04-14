@@ -4,7 +4,7 @@ use warnings;
 use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
 use GraphQL::Tiny::Utils::Type -all;
 
-use GraphQL::Tiny::Language::Kinds qw(Kind KIND);
+use GraphQL::Tiny::Language::Kinds qw(Kind);
 
 our @EXPORT_OK = qw(
     build_token

@@ -4,7 +4,7 @@ use Test::More;
 
 use GraphQL::Tiny::Language::Printer qw(ast_print);
 
-use GraphQL::Tiny::Language::Kinds qw(KIND);
+use GraphQL::Tiny::Language::Kinds qw(Kind);
 
 TODO: {
     local $TODO = 'test not implemented';
@@ -12,8 +12,8 @@ TODO: {
     subtest 'Printer: Query document' => sub {
         subtest 'it prints minimal ast' => sub {
             my $ast = {
-                kind => KIND->{FIELD},
-                name => { kind => KIND->{NAME}, value => 'foo' },
+                kind => Kind['FIELD'],
+                name => { kind => Kind['NAME'], value => 'foo' },
             };
             is ast_print($ast), 'foo';
         };

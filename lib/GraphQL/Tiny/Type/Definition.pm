@@ -169,7 +169,7 @@ use GraphQL::Tiny::Language::Ast qw(
     ValueNode
 );
 
-use GraphQL::Tiny::Language::Kinds qw(KIND);
+use GraphQL::Tiny::Language::Kinds qw(Kind);
 
 # TODO(port): language/printer
 sub print;
@@ -1604,7 +1604,7 @@ sub parse_literal {
     }
 
     # Note: variables will be resolved to a value before calling this function.
-    if ($value_node->{kind} ne KIND->{ENUM}) {
+    if (!Kind['ENUM']->check($value_node)) {
         my $value_str = print($value_node);
         croak build_graphql_error(
             sprintf('Enum "%s" cannot represent non-enum value: %s.', $type->{name}, $value_str) .
