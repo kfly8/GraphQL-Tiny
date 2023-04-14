@@ -7,6 +7,9 @@ our @EXPORT = qw(
     as
     where
     constraints_of_union
+    values_of_enum
+    value_of_enum
+    key_of_dict
 );
 
 use Type::Library -base, -declare => qw(
@@ -74,16 +77,18 @@ type 'Single',
         }
     };
 
+# type constraints in a Union type
 sub constraints_of_union :prototype($;$);
 sub constraints_of_union :prototype($;$) {
     my ($Union, $Original) = @_;
     $Original //= $Union;
 
     if (!$Union->isa('Type::Tiny::Union') && $Union->has_parent) {
-        return constraints_of_union($Union->parent, $Union);
+        return constraints_of_union($Union->parent, $Original);
     }
 
-    die "invalid type: $Original" unless $Union->isa('Type::Tiny::Union');
+    die "invalid type: $Original"
+        unless $Union->isa('Type::Tiny::Union');
 
     my @Types;
     for my $T ( @{ $Union->type_constraints } ) {
@@ -100,6 +105,48 @@ sub constraints_of_union :prototype($;$) {
         push @Types => $Type;
     }
     return \@Types
-};
+}
+
+# all values in an Enum type
+sub values_of_enum :prototype($);
+sub values_of_enum :prototype($) {
+    my ($Enum) = @_;
+
+    if (!$Enum->isa('Type::Tiny::Enum') && $Enum->has_parent) {
+        return values_of_enum($Enum->parent);
+    }
+
+    die "invalid type: $Enum"
+        unless $Enum->isa('Type::Tiny::Enum');
+
+    $Enum->values;
+}
+
+# the first value in an Enum type
+sub value_of_enum :prototype($) {
+    my ($Enum) = @_;
+    values_of_enum($Enum)->[0];
+}
+
+# Enum type of Dict type keys
+sub key_of_dict :prototype($;$);
+sub key_of_dict :prototype($;$) {
+    my ($Dict, $Original) = @_;
+    $Original //= $Dict;
+
+    if (!$Dict->is_parameterized && $Dict->has_parent) {
+        return key_of_dict($Dict->parent, $Original);
+    }
+
+    die "invalid type: $Original"
+        unless $Dict->is_a_type_of("Dict");
+
+    my $parameters = $Dict->parameters;
+    my @keys;
+    for (my $i = 0; $i < $parameters->@*; $i++) {
+        push @keys => $parameters->[$i] if $i % 2 == 0;
+    }
+    return Enum[@keys];
+}
 
 1;

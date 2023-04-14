@@ -55,4 +55,35 @@ subtest 'constraints_of_union' => sub {
     ok $@, 'not union';
 };
 
+subtest 'values_of_enum' => sub {
+    is_deeply values_of_enum(Enum['foo', 'bar']), ['foo', 'bar'], 'anonymous enum';
+
+    my $Enum = type 'MyEnum', as Enum['foo', 'bar'];
+    is_deeply values_of_enum($Enum), ['foo', 'bar'], 'named enum';
+
+    eval { values_of_enum(Str) };
+    ok $@, 'not enum';
+};
+
+subtest 'value_of_enum' => sub {
+    is_deeply value_of_enum(Enum['foo', 'bar']), 'foo', 'anonymous enum';
+
+    my $Enum = type 'MyEnum2', as Enum['foo', 'bar'];
+    is_deeply value_of_enum($Enum), 'foo', 'named enum';
+
+    eval { value_of_enum(Str) };
+    ok $@, 'not enum';
+};
+
+subtest 'key_of_dict' => sub {
+    my $Dict = Dict[foo => Str, bar => Int];
+    is key_of_dict($Dict), Enum['foo', 'bar'], 'anonymous dict';
+
+    my $Dict2 = type 'MyDict', as Dict[foo => Str, bar => Int];
+    is key_of_dict($Dict2), Enum['foo', 'bar'], 'named dict';
+
+    eval { key_of_dict(ArrayRef[Str]) };
+    ok $@, 'not dict';
+};
+
 done_testing;
