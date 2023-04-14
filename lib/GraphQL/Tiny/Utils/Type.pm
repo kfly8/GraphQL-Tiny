@@ -2,7 +2,12 @@ package GraphQL::Tiny::Utils::Type;
 use strict;
 use warnings;
 
-our @EXPORT = qw(type as where of_union_types);
+our @EXPORT = qw(
+    type
+    as
+    where
+    constraints_of_union
+);
 
 use Type::Library -base, -declare => qw(
     Any
@@ -69,21 +74,32 @@ type 'Single',
         }
     };
 
-sub of_union_types {
+sub constraints_of_union :prototype($;$);
+sub constraints_of_union :prototype($;$) {
     my ($Union, $Original) = @_;
+    $Original //= $Union;
 
     if (!$Union->isa('Type::Tiny::Union') && $Union->has_parent) {
-        return of_union_types($Union->parent, $Union);
+        return constraints_of_union($Union->parent, $Union);
     }
 
-    die "invalid type: $Union" unless $Union->isa('Type::Tiny::Union');
+    die "invalid type: $Original" unless $Union->isa('Type::Tiny::Union');
 
     my @Types;
     for my $T ( @{ $Union->type_constraints } ) {
-        my $Type = $T->isa('Type::Tiny::_DeclaredType') ? $Original->library->meta->get_type($T) : $T;
+        my $Type;
+        if ($T->isa('Type::Tiny::_DeclaredType')) {
+            my $meta = $Original->has_library ? $Original->library->meta
+                     : die "not found meta: $Original";
+            $Type = $meta->get_type($T);
+        }
+        else {
+            $Type = $T;
+        }
+
         push @Types => $Type;
     }
-    return @Types
-}
+    return \@Types
+};
 
 1;

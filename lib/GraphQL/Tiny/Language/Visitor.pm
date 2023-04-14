@@ -95,7 +95,7 @@ type 'ASTVisitor', as EnterLeaveVisitor[ASTNode] | KindVisitor;
 
 type 'KindVisitor', do {
     my @dict;
-    for my $Node (of_union_types(ASTNode)) {
+    for my $Node (@{constraints_of_union(ASTNode)}) {
         my %params = @{$Node->parent->parameters};
         my $Kind = $params{kind};
         my $key = $Kind->parent->values->[0];
@@ -177,7 +177,7 @@ type 'ASTReducerFn', as CodeRef,
 # A KeyMap describes each the traversable properties of each kind of node.
 type 'ASTVisitorKeyMap', do {
     my @dict;
-    for my $Node (of_union_types(ASTNode)) {
+    for my $Node (@{constraints_of_union(ASTNode)}) {
         my %params = @{$Node->parent->parameters};
         my $Kind = $params{kind};
         my $key = $Kind->parent->values->[0];

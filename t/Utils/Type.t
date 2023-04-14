@@ -45,14 +45,14 @@ subtest 'Single' => sub {
     ok !$Type->check("hoge!");
 };
 
-subtest 'of_union_types' => sub {
-    is_deeply [ of_union_types(Str | Int)], [Str, Int];
+subtest 'constraints_of_union' => sub {
+    is_deeply constraints_of_union(Str | Int), [Str, Int], 'anonymous union';
 
     my $Union = type 'MyUnion', as Str | Int;
-    is_deeply [ of_union_types($Union)], [Str, Int];
+    is_deeply constraints_of_union($Union), [Str, Int], 'named union';
 
-    eval { of_union_types(Str) };
-    ok $@;
+    eval { constraints_of_union(Str) };
+    ok $@, 'not union';
 };
 
 done_testing;
