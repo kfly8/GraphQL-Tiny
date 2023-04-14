@@ -96,12 +96,10 @@ type 'ASTVisitor', as EnterLeaveVisitor[ASTNode] | KindVisitor;
 type 'KindVisitor', do {
     my @dict;
     for my $Node (@{constraints_of_union(ASTNode)}) {
-        my %params = @{$Node->parent->parameters};
-        my $Kind = $params{kind};
-        my $key = $Kind->parent->values->[0];
+        my $Kind = parameters_of_dict($Node, 'kind');
 
         my $Visitor = ASTVisitFn[$Node] | EnterLeaveVisitor[$Node];
-        push @dict => ($key, Optional[$Visitor]);
+        push @dict => (value_of_enum($Kind), Optional[$Visitor]);
     }
     as Dict[@dict];
 };
@@ -178,12 +176,9 @@ type 'ASTReducerFn', as CodeRef,
 type 'ASTVisitorKeyMap', do {
     my @dict;
     for my $Node (@{constraints_of_union(ASTNode)}) {
-        my %params = @{$Node->parent->parameters};
-        my $Kind = $params{kind};
-        my $key = $Kind->parent->values->[0];
-
-        my @keys = keys %params;
-        push @dict => ($key, ReadonlyArray[Enum[@keys]]);
+        my $Kind = parameters_of_dict($Node, 'kind');
+        my $Enum = key_of_dict($Node);
+        push @dict => (value_of_enum($Kind), ReadonlyArray[$Enum]);
     }
     as Dict[@dict];
 };
@@ -195,18 +190,14 @@ type 'ASTReducer', as Dict,
         my ($R) = @_;
 
         my @dict;
-        for my $Node (@{ASTNode->parent->type_constraints}) {
-            my $Type = __PACKAGE__->meta->get_type($Node);
-
-            my %params = @{$Type->parent->parameters};
-            my $Kind = $params{kind};
-            my $key = $Kind->parent->values->[0];
+        for my $Node (@{constraints_of_union(ASTNode)}) {
+            my $Kind = parameters_of_dict($Node, 'kind');
 
             my $Reducer = {
                 enter => Optional[ ASTReducerFn[$Node] ],
                 leave => ASTReducerFn[$Node, $R],
             };
-            push @dict => ($key, $Reducer);
+            push @dict => (value_of_enum($Kind), $Reducer);
         }
         my $Type = Dict[@dict];
 

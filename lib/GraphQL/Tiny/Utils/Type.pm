@@ -130,13 +130,19 @@ sub value_of_enum :prototype($) {
 }
 
 # Parameters of Dict type
-sub parameters_of_dict :prototype($;$);
-sub parameters_of_dict :prototype($;$) {
-    my ($Dict, $Original) = @_;
+sub parameters_of_dict :prototype($;$$);
+sub parameters_of_dict :prototype($;$$) {
+    my ($Dict, $key, $Original) = @_;
     $Original //= $Dict;
 
+    if ($key) {
+        my %params = @{ parameters_of_dict($Dict, undef, $Original) };
+        die "cannot find key: $key in $Original" unless $params{$key};
+        return $params{$key};
+    }
+
     if (!$Dict->is_parameterized && $Dict->has_parent) {
-        return parameters_of_dict($Dict->parent, $Original);
+        return parameters_of_dict($Dict->parent, $key, $Original);
     }
 
     die "invalid type: $Original"

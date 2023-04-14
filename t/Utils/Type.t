@@ -84,6 +84,15 @@ subtest 'parameters_of_dict' => sub {
 
     eval { parameters_of_dict(ArrayRef[Str]) };
     ok $@, 'not dict';
+
+    subtest 'given a key' => sub {
+        is parameters_of_dict($Dict, 'foo'), Str, 'foo type isa Str';
+        is parameters_of_dict($Dict, 'bar'), Int, 'bar type isa Int';
+
+        local $@;
+        eval { parameters_of_dict($Dict, 'baz') };
+        ok $@;
+    };
 };
 
 subtest 'key_of_dict' => sub {
