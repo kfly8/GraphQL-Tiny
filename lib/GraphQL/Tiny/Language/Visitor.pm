@@ -14,6 +14,7 @@ use Scalar::Util qw(blessed);
 
 our @EXPORT_OK = qw(
     visit
+    get_enter_leave_for_kind
 );
 
 use Type::Library -base, -declare => qw(
@@ -207,6 +208,45 @@ type 'ASTReducer', as Dict,
 
 sub visit {
 }
+
+
+# Given a visitor instance and a node kind, return EnterLeaveVisitor for that kind.
+sub get_enter_leave_for_kind {
+    my ($visitor, $kind) = @_;
+
+    if (ASSERT) {
+        ASTVisitor->assert_valid($visitor);
+        Kind->assert_valid($kind);
+    }
+
+    my $kind_visitor = $visitor->{$kind};
+    if (ASSERT) {
+        my $KindVisitor = ASTVisitFn[ASTNode] | EnterLeaveVisitor[ASTNode] | Undef;
+        $KindVisitor->assert_valid($kind_visitor);
+    }
+
+    my $result;
+    if (ref $kind_visitor eq 'HASH') {
+        # { Kind: { enter() {}, leave() {} } }
+        $result = $kind_visitor;
+    } elsif (ref $kind_visitor eq 'CODE') {
+        # { Kind() {} }
+        $result = { enter => $kind_visitor, leave => undef };
+    }
+    else {
+        # { enter() {}, leave() {} }
+        $result = { enter => $visitor->{enter}, leave => $visitor->{leave} };
+    }
+
+    if (ASSERT) {
+        my $EnterLeaveVisitor = EnterLeaveVisitor[ASTNode];
+        $EnterLeaveVisitor->assert_valid($result);
+    }
+
+    return $result;
+}
+
+
 
 sub _extends_ASTNode {
     my ($Node) = @_;
