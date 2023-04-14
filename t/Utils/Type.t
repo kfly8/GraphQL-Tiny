@@ -75,11 +75,22 @@ subtest 'value_of_enum' => sub {
     ok $@, 'not enum';
 };
 
+subtest 'parameters_of_dict' => sub {
+    my $Dict = Dict[foo => Str, bar => Int];
+    is_deeply parameters_of_dict($Dict), ['foo', Str, 'bar', Int], 'anonymous dict';
+
+    my $Dict2 = type 'MyDict', as Dict[foo => Str, bar => Int];
+    is_deeply parameters_of_dict($Dict2), ['foo', Str, 'bar', Int], 'named dict';
+
+    eval { parameters_of_dict(ArrayRef[Str]) };
+    ok $@, 'not dict';
+};
+
 subtest 'key_of_dict' => sub {
     my $Dict = Dict[foo => Str, bar => Int];
     is key_of_dict($Dict), Enum['foo', 'bar'], 'anonymous dict';
 
-    my $Dict2 = type 'MyDict', as Dict[foo => Str, bar => Int];
+    my $Dict2 = type 'MyDict2', as Dict[foo => Str, bar => Int];
     is key_of_dict($Dict2), Enum['foo', 'bar'], 'named dict';
 
     eval { key_of_dict(ArrayRef[Str]) };

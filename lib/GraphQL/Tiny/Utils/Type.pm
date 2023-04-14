@@ -9,6 +9,7 @@ our @EXPORT = qw(
     constraints_of_union
     values_of_enum
     value_of_enum
+    parameters_of_dict
     key_of_dict
 );
 
@@ -128,22 +129,29 @@ sub value_of_enum :prototype($) {
     values_of_enum($Enum)->[0];
 }
 
-# Enum type of Dict type keys
-sub key_of_dict :prototype($;$);
-sub key_of_dict :prototype($;$) {
+# Parameters of Dict type
+sub parameters_of_dict :prototype($;$);
+sub parameters_of_dict :prototype($;$) {
     my ($Dict, $Original) = @_;
     $Original //= $Dict;
 
     if (!$Dict->is_parameterized && $Dict->has_parent) {
-        return key_of_dict($Dict->parent, $Original);
+        return parameters_of_dict($Dict->parent, $Original);
     }
 
     die "invalid type: $Original"
         unless $Dict->is_a_type_of("Dict");
 
-    my $parameters = $Dict->parameters;
+    $Dict->parameters;
+}
+
+# Enum type of Dict type keys
+sub key_of_dict :prototype($) {
+    my ($Dict) = @_;
+
+    my $parameters = parameters_of_dict($Dict);
     my @keys;
-    for (my $i = 0; $i < $parameters->@*; $i++) {
+    for (my $i = 0; $i < @$parameters; $i++) {
         push @keys => $parameters->[$i] if $i % 2 == 0;
     }
     return Enum[@keys];
