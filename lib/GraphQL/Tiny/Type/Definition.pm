@@ -2,11 +2,12 @@ package GraphQL::Tiny::Type::Definition;
 use strict;
 use warnings;
 use feature qw(state);
+use GraphQL::Tiny::Inner::TypeUtils qw(type as where);
+use GraphQL::Tiny::Inner::TypeLibrary -all;
 
 use Carp qw(croak);
 
 use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
-use GraphQL::Tiny::Utils::Type -all;
 use GraphQL::Tiny::Utils::Error qw(build_error);
 use GraphQL::Tiny::Utils::Path qw(Path);
 use GraphQL::Tiny::Utils::IdentityFunc qw(identity_func);

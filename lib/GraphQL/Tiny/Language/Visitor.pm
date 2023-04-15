@@ -1,8 +1,17 @@
 package GraphQL::Tiny::Language::Visitor;
 use strict;
 use warnings;
+use GraphQL::Tiny::Inner::TypeUtils qw(
+    type
+    as
+    constraints_of_union
+    parameters_of_dict
+    value_of_enum
+    key_of_dict
+);
+use GraphQL::Tiny::Inner::TypeLibrary -all;
+
 use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
-use GraphQL::Tiny::Utils::Type -all;
 
 use GraphQL::Tiny::Language::Ast qw(ASTNode);
 use GraphQL::Tiny::Language::Ast qw(is_Node QUERY_DOCUMENT_KEYS);

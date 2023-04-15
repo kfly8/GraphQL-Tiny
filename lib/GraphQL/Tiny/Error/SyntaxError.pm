@@ -2,7 +2,7 @@ package GraphQL::Tiny::Error::SyntaxError;
 use strict;
 use warnings;
 use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
-use GraphQL::Tiny::Utils::Type -all;
+use GraphQL::Tiny::Inner::TypeLibrary -all;
 
 use GraphQL::Tiny::Language::Source qw(Source);
 

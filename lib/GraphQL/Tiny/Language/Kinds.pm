@@ -1,7 +1,8 @@
 package GraphQL::Tiny::Language::Kinds;
 use strict;
 use warnings;
-use GraphQL::Tiny::Utils::Type -all;
+use GraphQL::Tiny::Inner::TypeUtils qw(type as);
+use GraphQL::Tiny::Inner::TypeLibrary -all;
 
 use Carp qw(croak);
 use Exporter 'import';

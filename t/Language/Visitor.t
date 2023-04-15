@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use GraphQL::Tiny::Utils::Type qw(CodeRef);
+use GraphQL::Tiny::Inner::TypeLibrary qw(CodeRef);
 use GraphQL::Tiny::Language::Ast qw(ASTNode NameNode);
 
 use GraphQL::Tiny::Language::Visitor qw(

@@ -1,7 +1,8 @@
 package GraphQL::Tiny::Language::TokenKind;
 use strict;
 use warnings;
-use GraphQL::Tiny::Utils::Type -all;
+use GraphQL::Tiny::Inner::TypeUtils qw(type as);
+use GraphQL::Tiny::Inner::TypeLibrary -all;
 
 our @EXPORT_OK = qw(TokenKind);
 

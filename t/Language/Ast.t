@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use GraphQL::Tiny::Utils::Type -all;
+use GraphQL::Tiny::Inner::TypeLibrary -all;
 use GraphQL::Tiny::Language::Source qw(build_source);
 
 use GraphQL::Tiny::Language::Ast qw(

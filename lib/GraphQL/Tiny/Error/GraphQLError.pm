@@ -1,8 +1,10 @@
 package GraphQL::Tiny::Error::GraphQLError;
 use strict;
 use warnings;
+use GraphQL::Tiny::Inner::TypeUtils qw(type as);
+use GraphQL::Tiny::Inner::TypeLibrary -all;
+
 use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
-use GraphQL::Tiny::Utils::Type -all;
 use GraphQL::Tiny::Utils::Error qw(Error build_error);
 
 our @EXPORT_OK = qw(build_graphql_error);

@@ -2,9 +2,10 @@ package GraphQL::Tiny::Language::Location;
 use strict;
 use warnings;
 use utf8;
+use GraphQL::Tiny::Inner::TypeUtils qw(type as);
+use GraphQL::Tiny::Inner::TypeLibrary -all;
 
 use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
-use GraphQL::Tiny::Utils::Type -all;
 use GraphQL::Tiny::Utils::Invariant qw(invariant);
 
 our @EXPORT_OK = qw(get_location);

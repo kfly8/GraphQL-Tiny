@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use GraphQL::Tiny::Utils::Type -all;
+use GraphQL::Tiny::Inner::TypeLibrary -all;
 use GraphQL::Tiny::Utils::Error qw(Error build_error to_error);
 
 subtest 'Error' => sub {

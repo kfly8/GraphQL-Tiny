@@ -1,8 +1,10 @@
 package GraphQL::Tiny::Language::Source;
 use strict;
 use warnings;
+use GraphQL::Tiny::Inner::TypeUtils qw(type as);
+use GraphQL::Tiny::Inner::TypeLibrary -all;
+
 use GraphQL::Tiny::Utils::DevAssert qw(ASSERT dev_assert);
-use GraphQL::Tiny::Utils::Type -all;
 
 our @EXPORT_OK = qw(build_source is_Source);
 
