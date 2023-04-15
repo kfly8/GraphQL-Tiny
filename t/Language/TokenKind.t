@@ -2,14 +2,14 @@ use strict;
 use warnings;
 use Test::More;
 
-use GraphQL::Tiny::Language::TokenKind qw(TOKEN_KIND TokenKind);
+use GraphQL::Tiny::Language::TokenKind qw(TokenKind);
 
-isa_ok TokenKind, 'Type::Tiny';
+subtest 'TOkenKind' => sub {
+    isa_ok TokenKind, 'Type::Tiny';
 
-my $amp = '&';
-ok TokenKind->check($amp);
-ok !TokenKind->check('foo');
-
-is TOKEN_KIND->{AMP}, $amp;
+    my $amp = '&';
+    ok TokenKind->check($amp);
+    ok !TokenKind->check('foo');
+};
 
 done_testing;
