@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use GraphQL::Tiny::Inner::TypeLibrary -all;
+use GraphQL::Tiny::Inner::TypeLibrary qw(Any Dict Slurpy Str);
 use GraphQL::Tiny::Utils::Error qw(Error build_error to_error);
 
 subtest 'Error' => sub {

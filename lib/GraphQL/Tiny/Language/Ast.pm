@@ -2,7 +2,20 @@ package GraphQL::Tiny::Language::Ast;
 use strict;
 use warnings;
 use GraphQL::Tiny::Inner::TypeUtils qw(type as);
-use GraphQL::Tiny::Inner::TypeLibrary -all;
+use GraphQL::Tiny::Inner::TypeLibrary qw(
+    Any
+    Bool
+    Dict
+    Enum
+    HashRef
+    Int
+    Null
+    Optional
+    ReadonlyArray
+    Slurpy
+    Str
+    Undef
+);
 
 use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
 

@@ -1,8 +1,9 @@
 package GraphQL::Tiny::Language::Printer;
 use strict;
 use warnings;
+use GraphQL::Tiny::Inner::TypeLibrary qw(Null ReadonlyArray Str Undef);
+
 use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
-use GraphQL::Tiny::Inner::TypeLibrary -all;
 
 use Exporter 'import';
 

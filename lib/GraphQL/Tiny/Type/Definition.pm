@@ -3,7 +3,20 @@ use strict;
 use warnings;
 use feature qw(state);
 use GraphQL::Tiny::Inner::TypeUtils qw(type as where);
-use GraphQL::Tiny::Inner::TypeLibrary -all;
+use GraphQL::Tiny::Inner::TypeLibrary qw(
+    Any
+    ArrayRef
+    CodeRef
+    Dict
+    Map
+    Maybe
+    Null
+    Optional
+    ReadonlyArray
+    Str
+    Undef
+    Unknown
+);
 
 use Carp qw(croak);
 

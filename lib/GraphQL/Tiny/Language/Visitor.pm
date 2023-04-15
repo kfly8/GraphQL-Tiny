@@ -9,7 +9,18 @@ use GraphQL::Tiny::Inner::TypeUtils qw(
     value_of_enum
     key_of_dict
 );
-use GraphQL::Tiny::Inner::TypeLibrary -all;
+use GraphQL::Tiny::Inner::TypeLibrary qw(
+    Any
+    CodeRef
+    Dict
+    Int
+    Null
+    Optional
+    ReadonlyArray
+    Single
+    Str
+    Undef
+);
 
 use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
 

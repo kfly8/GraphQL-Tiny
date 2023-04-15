@@ -2,18 +2,10 @@ use strict;
 use warnings;
 use Test::More;
 
-use GraphQL::Tiny::Inner::TypeLibrary -all;
+use GraphQL::Tiny::Inner::TypeLibrary qw(Enum ReadonlyArray);
 use GraphQL::Tiny::Language::Source qw(build_source);
 
-use GraphQL::Tiny::Language::Ast qw(
-    Token build_token Location build_location
-    ASTNode ASTKindToNode
-    NameNode DocumentNode
-    QUERY_DOCUMENT_KEYS
-    is_Node
-);
-
-use GraphQL::Tiny::Language::Ast -types;
+use GraphQL::Tiny::Language::Ast -all;
 
 subtest 'Token' => sub {
     isa_ok Token, 'Type::Tiny';

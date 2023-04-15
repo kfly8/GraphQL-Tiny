@@ -1,9 +1,9 @@
 package GraphQL::Tiny::Utils::ToObjMap;
 use strict;
 use warnings;
+use GraphQL::Tiny::Inner::TypeLibrary qw(HashRef Undef);
 
 use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
-use GraphQL::Tiny::Inner::TypeLibrary -all;
 
 use Exporter 'import';
 

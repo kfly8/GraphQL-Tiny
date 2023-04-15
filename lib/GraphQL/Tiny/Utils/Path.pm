@@ -2,7 +2,7 @@ package GraphQL::Tiny::Utils::Path;
 use strict;
 use warnings;
 use GraphQL::Tiny::Inner::TypeUtils qw(type as);
-use GraphQL::Tiny::Inner::TypeLibrary -all;
+use GraphQL::Tiny::Inner::TypeLibrary qw(Dict Int Str Undef);
 
 use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
 

@@ -2,7 +2,15 @@ package GraphQL::Tiny::Error::LocatedError;
 use strict;
 use warnings;
 use GraphQL::Tiny::Inner::TypeUtils qw(type as);
-use GraphQL::Tiny::Inner::TypeLibrary -all;
+use GraphQL::Tiny::Inner::TypeLibrary qw(
+    Int
+    Maybe
+    Null
+    ReadonlyArray
+    Str
+    Undef
+    Unknown
+);
 
 use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
 use GraphQL::Tiny::Utils::Error qw(to_error);

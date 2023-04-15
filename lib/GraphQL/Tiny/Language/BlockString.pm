@@ -4,7 +4,14 @@ use warnings;
 use utf8;
 
 use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
-use GraphQL::Tiny::Inner::TypeLibrary -all;
+use GraphQL::Tiny::Inner::TypeLibrary qw(
+    ArrayRef
+    Bool
+    Dict
+    Optional
+    ReadonlyArray
+    Str
+);
 
 use List::Util qw(all);
 
