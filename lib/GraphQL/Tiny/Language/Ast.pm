@@ -10,7 +10,7 @@ our @EXPORT_OK = qw(
     build_token
     build_location
 
-    QueryDocumentKeys
+    QUERY_DOCUMENT_KEYS
     is_Node
 );
 
@@ -256,7 +256,7 @@ type 'ASTNode',
 
 # @internal
 # { [NodeT in ASTNode as NodeT['kind']]: ReadonlyArray<keyof NodeT>; }
-use constant QueryDocumentKeys => {
+use constant QUERY_DOCUMENT_KEYS => {
   Name => [],
 
   Document => ['definitions'],
@@ -356,8 +356,8 @@ use constant QueryDocumentKeys => {
   InputObjectTypeExtension => ['name', 'directives', 'fields'],
 };
 
-#const kindValues = new Set<string>(Object.keys(QueryDocumentKeys));
-my %KIND_VALUES = map { $_ => 1 } keys %{ QueryDocumentKeys() };
+#const kindValues = new Set<string>(Object.keys(QUERY_DOCUMENT_KEYS));
+my %KIND_VALUES = map { $_ => 1 } keys %{ QUERY_DOCUMENT_KEYS() };
 
 # @internal
 sub is_Node {

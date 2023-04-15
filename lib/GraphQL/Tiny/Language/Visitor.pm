@@ -5,7 +5,7 @@ use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
 use GraphQL::Tiny::Utils::Type -all;
 
 use GraphQL::Tiny::Language::Ast qw(ASTNode);
-use GraphQL::Tiny::Language::Ast qw(is_Node QueryDocumentKeys);
+use GraphQL::Tiny::Language::Ast qw(is_Node QUERY_DOCUMENT_KEYS);
 use GraphQL::Tiny::Language::Kinds qw(Kind);
 
 use Sub::Util qw(subname);

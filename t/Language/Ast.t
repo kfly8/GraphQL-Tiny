@@ -9,7 +9,7 @@ use GraphQL::Tiny::Language::Ast qw(
     Token build_token Location build_location
     ASTNode ASTKindToNode
     NameNode DocumentNode
-    QueryDocumentKeys
+    QUERY_DOCUMENT_KEYS
     is_Node
 );
 
@@ -66,7 +66,7 @@ subtest 'ASTKindToNode' => sub {
     is $params{Document}, DocumentNode;
 };
 
-subtest 'QueryDocumentKeys' => sub {
+subtest 'QUERY_DOCUMENT_KEYS' => sub {
 
     # { [NodeT in ASTNode as NodeT['kind']]: ReadonlyArray<keyof NodeT>; }
     for my $Node (@{ASTNode->parent->type_constraints}) {
@@ -84,8 +84,8 @@ subtest 'QueryDocumentKeys' => sub {
         }
 
         my $KeyofNode = ReadonlyArray[ Enum[@node_keys] ];
-        ok($KeyofNode->check(QueryDocumentKeys->{$key}), $key)
-            or note explain $KeyofNode->validate(QueryDocumentKeys->{$key});
+        ok($KeyofNode->check(QUERY_DOCUMENT_KEYS->{$key}), $key)
+            or note explain $KeyofNode->validate(QUERY_DOCUMENT_KEYS->{$key});
     }
 };
 
