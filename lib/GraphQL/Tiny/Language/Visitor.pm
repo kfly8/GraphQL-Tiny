@@ -1,6 +1,30 @@
 package GraphQL::Tiny::Language::Visitor;
 use strict;
 use warnings;
+
+our @EXPORT_OK = qw(
+    visit
+    get_enter_leave_for_kind
+);
+
+use Type::Library -base, -declare => qw(
+    ASTVisitor
+    EnterLeaveVisitor
+    ASTVisitFn
+    KindVisitor
+    ASTVisitorKeyMap
+    ASTReducer
+    ASTReducerFn
+    ReducedField
+);
+
+use Sub::Util qw(subname);
+use List::Util qw(any);
+use Scalar::Util qw(blessed);
+use GraphQL::Tiny::Utils::DevAssert qw(ASSERT dev_assert);
+use GraphQL::Tiny::Language::Ast qw(ASTNode);
+use GraphQL::Tiny::Language::Ast qw(is_Node QUERY_DOCUMENT_KEYS);
+use GraphQL::Tiny::Language::Kinds qw(Kind);
 use GraphQL::Tiny::Inner::TypeUtils qw(
     type
     as
@@ -14,39 +38,13 @@ use GraphQL::Tiny::Inner::TypeLibrary qw(
     CodeRef
     Dict
     Int
+    Map
     Null
     Optional
     ReadonlyArray
     Single
     Str
     Undef
-);
-
-use GraphQL::Tiny::Utils::DevAssert qw(ASSERT);
-
-use GraphQL::Tiny::Language::Ast qw(ASTNode);
-use GraphQL::Tiny::Language::Ast qw(is_Node QUERY_DOCUMENT_KEYS);
-use GraphQL::Tiny::Language::Kinds qw(Kind);
-
-use Sub::Util qw(subname);
-use List::Util qw(any);
-use Scalar::Util qw(blessed);
-
-our @EXPORT_OK = qw(
-    visit
-    get_enter_leave_for_kind
-);
-
-use Type::Library -base, -declare => qw(
-    ASTVisitor
-
-    EnterLeaveVisitor
-    ASTVisitFn
-    KindVisitor
-    ASTVisitorKeyMap
-    ASTReducer
-    ASTReducerFn
-    ReducedField
 );
 
 # A visitor is comprised of visit functions, which are called on each node
@@ -225,10 +223,241 @@ type 'ASTReducer', as Dict,
         return sub { $Type->check(@_) }
     };
 
+# visit() will walk through an AST using a depth-first traversal, calling
+# the visitor's enter function at each node in the traversal, and calling the
+# leave function after visiting that node and all of its child nodes.
+#
+# By returning different values from the enter and leave functions, the
+# behavior of the visitor can be altered, including skipping over a sub-tree of
+# the AST (by returning false), editing the AST by returning a value or null
+# to remove the value, or to stop the whole traversal by returning BREAK.
+#
+# When using visit() to edit an AST, the original AST will not be modified, and
+# a new version of the AST with the changes applied will be returned from the
+# visit function.
+#
+# ```ts
+# const editedAST = visit(ast, {
+#   enter(node, key, parent, path, ancestors) {
+#     // @return
+#     //   undefined: no action
+#     //   false: skip visiting this node
+#     //   visitor.BREAK: stop visiting altogether
+#     //   null: delete this node
+#     //   any value: replace this node with the returned value
+#   },
+#   leave(node, key, parent, path, ancestors) {
+#     // @return
+#     //   undefined: no action
+#     //   false: no action
+#     //   visitor.BREAK: stop visiting altogether
+#     //   null: delete this node
+#     //   any value: replace this node with the returned value
+#   }
+# });
+# ```
+#
+# Alternatively to providing enter() and leave() functions, a visitor can
+# instead provide functions named the same as the kinds of AST nodes, or
+# enter/leave visitors at a named key, leading to three permutations of the
+# visitor API:
+#
+# 1) Named visitors triggered when entering a node of a specific kind.
+#
+# ```ts
+# visit(ast, {
+#   Kind(node) {
+#     // enter the "Kind" node
+#   }
+# })
+# ```
+#
+# 2) Named visitors that trigger upon entering and leaving a node of a specific kind.
+#
+# ```ts
+# visit(ast, {
+#   Kind: {
+#     enter(node) {
+#       // enter the "Kind" node
+#     }
+#     leave(node) {
+#       // leave the "Kind" node
+#     }
+#   }
+# })
+# ```
+#
+# 3) Generic visitors that trigger upon entering and leaving any node.
+#
+# ```ts
+# visit(ast, {
+#   enter(node) {
+#     // enter any node
+#   },
+#   leave(node) {
+#     // leave any node
+#   }
+# })
+# ```
 
 sub visit {
-}
+    my ($root, $visitor, $visitor_keys) = @_;
 
+    if (ASSERT) {
+        # TODO: port
+        #export function visit<N extends ASTNode>(
+        #  root: N,
+        #  visitor: ASTVisitor,
+        #  visitorKeys?: ASTVisitorKeyMap,
+        #): N;
+        #export function visit<R>(
+        #  root: ASTNode,
+        #  visitor: ASTReducer<R>,
+        #  visitorKeys?: ASTVisitorKeyMap,
+        #): R;
+        #export function visit(
+        #  root: ASTNode,
+        #  visitor: ASTVisitor | ASTReducer<any>,
+        #  visitorKeys: ASTVisitorKeyMap = QueryDocumentKeys,
+        #): any {
+    }
+
+    my $enter_leave_map = {};
+    for my $kind (@{values_of_enum(Kind)}) {
+        $enter_leave_map->{$kind} = get_enter_leave_for_kind($visitor, $kind);
+    }
+    if (ASSERT) {
+        my $EnterLeaveMap = Map[Kind, EnterLeaveVisitor[ASTNode]];
+        $EnterLeaveMap->assert_valid($enter_leave_map);
+    }
+
+    my $stack = undef;
+    my $in_array = ref $root && ref $root eq 'ARRAY';
+    my $keys = [$root];
+    my $index = -1;
+    my $edits = [];
+    my $node = $root;
+    my $key = undef;
+    my $parent = undef;
+    my $path = [];
+    my $ancestors = [];
+
+    do {
+        $index++;
+        my $is_leaving = $index == scalar @$keys;
+        my $is_edited = $is_leaving && scalar @$edits != 0;
+        if ($is_leaving) {
+            $key = scalar @$ancestors == 0 ? undef : $path->[-1];
+            $node = $parent;
+            $parent = pop @$ancestors;
+            if ($is_edited) {
+                if ($in_array) {
+                    $node = [@$node]; # shallow copy
+
+                    my $edit_offset = 0;
+                    for my $edit (@$edits) {
+                        my ($edit_key, $edit_value) = @$edit;
+                        my $array_key = $edit_key - $edit_offset;
+                        if (!defined $edit_value) {
+                            splice @$node, $array_key, 1;
+                            $edit_offset++;
+                        } else {
+                            $node->[$array_key] = $edit_value;
+                        }
+                    }
+                }
+                else {
+                    $node = { %$node }; # shallow copy
+
+                    for my $edit (@$edits) {
+                        my ($edit_key, $edit_value) = @$edit;
+                        $node->{$edit_key} = $edit_value;
+                    }
+                }
+            }
+
+            $index = $stack->{index};
+            $keys = $stack->{keys};
+            $edits = $stack->{edits};
+            $in_array = $stack->{in_array};
+            $stack = $stack->{prev};
+        }
+        elsif ($parent) {
+            $key = $in_array ? $index : $keys->[$index];
+            $node = $parent->{$key};
+            if (!defined $node) {
+                next;
+            }
+            push @$path, $key;
+        }
+
+        my $result;
+        if (!(ref $node && ref $node eq 'ARRAY')) {
+            dev_assert(is_Node($node), "Invalid AST Node: " . inspect($node) . ".");
+
+            my $visit_fn = $is_leaving
+                ? $enter_leave_map->{$node->{kind}}->{leave}
+                : $enter_leave_map->{$node->{kind}}->{enter};
+
+            $result = $visit_fn ? $visit_fn->($node, $key, $parent, $path, $ancestors) : undef;
+
+            if (_is_BREAK($result)) {
+                last;
+            }
+
+            if ($result == !!0) {
+                if (!$is_leaving) {
+                    pop @$path;
+                    next;
+                }
+            }
+            elsif (defined $result) {
+                push @$edits, [$key, $result];
+                if (!$is_leaving) {
+                    if (is_Node($result)) {
+                        $node = $result;
+                    }
+                    else {
+                        pop @$path;
+                        next;
+                    }
+                }
+            }
+        }
+
+        if (!defined $result && $is_edited) {
+            push @$edits, [$key, $node];
+        }
+
+        if ($is_leaving) {
+            pop @$path;
+        }
+        else {
+            $stack = {
+                in_array => $in_array,
+                index => $index,
+                keys => $keys,
+                edits => $edits,
+                prev => $stack,
+            };
+            $in_array = ref $node && ref $node eq 'ARRAY';
+            $keys = $in_array ? $node : ($visitor_keys->{$node->{kind}} // []);
+            $index = -1;
+            $edits = [];
+            if ($parent) {
+                push @$ancestors, $parent;
+            }
+            $parent = $node;
+        }
+    } while (defined $stack);
+
+    if (scalar @$edits != 0) {
+        # New root
+        return $edits->[-1]->[1];
+    }
+
+    return $root;
+}
 
 # Given a visitor instance and a node kind, return EnterLeaveVisitor for that kind.
 sub get_enter_leave_for_kind {
@@ -274,6 +503,12 @@ sub _extends_ASTNode {
     return 1 if $Node eq ASTNode;
     my $Nodes = ASTNode->parent->type_constraints;
     return any { $_ eq $Node } @{$Nodes};
+}
+
+sub _is_BREAK {
+    my ($result) = @_;
+
+    ref $result && ref $result eq 'HASH' && %{$result} == 0;
 }
 
 1;
